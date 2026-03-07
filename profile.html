@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fixkar – Profile</title>
+  <link rel='stylesheet' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'>
+  <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap'>
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    :root {
+      --glass-bg:   rgba(255,255,255,0.08);
+      --glass-border: rgba(198,195,195,0.55);
+      --primary:    #c6c3c3;
+      --white:      #ffffff;
+      --black:      #000000;
+      --danger:     #ff6b6b;
+      --accent:     rgba(255,255,255,0.18);
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      background-image: url("registration_bg.png");
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      min-height: 100vh;
+      color: var(--white);
+    }
+
+    /* ── Overlay ── */
+    .page-overlay {
+      min-height: 100vh;
+      background: rgba(0,0,0,0.35);
+      display: flex;
+      flex-direction: column;
+    }
+
+    a { text-decoration: none; color: var(--white); }
+
+    /* ══════════════════════════════
+       NAVBAR
+    ══════════════════════════════ */
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 32px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+      background: rgba(0,0,0,0.25);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-logo {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .nav-logo span { color: var(--primary); }
+
+    .search-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: var(--glass-bg);
+      border: 1.5px solid var(--glass-border);
+      border-radius: 30px;
+      padding: 0 18px;
+      height: 42px;
+      gap: 10px;
+      max-width: 480px;
+    }
+
+    .search-wrap input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--white);
+      font-family: "Poppins", sans-serif;
+      font-size: 14px;
+    }
+
+    .search-wrap input::placeholder { color: rgba(255,255,255,0.5); }
+    .search-wrap i { font-size: 18px; opacity: 0.7; cursor: pointer; }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .btn-ghost {
+      padding: 8px 20px;
+      border: 1.5px solid var(--primary);
+      border-radius: 30px;
+      font-size: 14px;
+      font-family: "Poppins", sans-serif;
+      cursor: pointer;
+      background: transparent;
+      color: var(--white);
+      transition: background 0.25s, color 0.25s;
+      font-weight: 500;
+    }
+
+    .btn-ghost:hover { background: var(--primary); color: var(--black); }
+
+    .btn-solid {
+      padding: 8px 22px;
+      border: none;
+      border-radius: 30px;
+      font-size: 14px;
+      font-family: "Poppins", sans-serif;
+      cursor: pointer;
+      background: var(--primary);
+      color: var(--black);
+      font-weight: 600;
+      transition: background 0.25s, transform 0.15s;
+    }
+
+    .btn-solid:hover { background: var(--white); transform: scale(1.03); }
+
+    /* ══════════════════════════════
+       MAIN CONTENT
+    ══════════════════════════════ */
+    .main {
+      flex: 1;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* ── Glass Card base ── */
+    .glass-card {
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      background: var(--glass-bg);
+      border: 1.5px solid var(--glass-border);
+      border-radius: 18px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+      padding: 28px;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .glass-card:nth-child(2) { animation-delay: 0.1s; }
+    .glass-card:nth-child(3) { animation-delay: 0.2s; }
+
+    /* ══════════════════════════════
+       SECTION 1 — EDIT PROFILE
+    ══════════════════════════════ */
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title i { font-size: 22px; color: var(--primary); }
+
+    .profile-layout {
+      display: flex;
+      gap: 28px;
+      align-items: flex-start;
+    }
+
+    /* Avatar */
+    .avatar-wrap {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 2.5px solid var(--primary);
+      background: rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .avatar-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    .avatar-circle i { font-size: 52px; opacity: 0.5; }
+
+    .avatar-circle:hover::after {
+      content: "Change";
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 50%;
+    }
+
+    .select-btn {
+      padding: 6px 18px;
+      border: 1.5px solid var(--primary);
+      border-radius: 20px;
+      background: transparent;
+      color: var(--white);
+      font-size: 12px;
+      font-family: "Poppins", sans-serif;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .select-btn:hover { background: var(--primary); color: var(--black); }
+
+    /* Profile form */
+    .profile-form {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px 20px;
+      align-items: start;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full { grid-column: 1 / -1; }
+
+    .form-group label {
+      font-size: 13px;
+      opacity: 0.75;
+      font-weight: 500;
+    }
+
+    .form-group input {
+      background: rgba(255,255,255,0.08);
+      border: 1.5px solid var(--glass-border);
+      border-radius: 10px;
+      padding: 10px 16px;
+      color: var(--white);
+      font-family: "Poppins", sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.25s;
+    }
+
+    .form-group input:focus { border-color: var(--primary); }
+
+    .pw-wrap {
+      position: relative;
+    }
+
+    .pw-wrap input { width: 100%; padding-right: 44px; }
+
+    .pw-wrap i {
+      position: absolute;
+      right: 14px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      cursor: pointer;
+      opacity: 0.7;
+    }
+
+    .form-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .save-btn {
+      padding: 10px 32px;
+      background: var(--primary);
+      border: none;
+      border-radius: 30px;
+      color: var(--black);
+      font-family: "Poppins", sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.25s, transform 0.15s;
+    }
+
+    .save-btn:hover { background: var(--white); transform: scale(1.03); }
+    .save-btn:active { transform: scale(0.97); }
+
+    /* ══════════════════════════════
+       SECTION 2 — MY ADS
+    ══════════════════════════════ */
+    .ads-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .ads-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    /* Ad Card */
+    .ad-card {
+      background: rgba(255,255,255,0.07);
+      border: 1.5px solid var(--glass-border);
+      border-radius: 14px;
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.25s, box-shadow 0.25s;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .ad-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.3);
+    }
+
+    .ad-card .ad-img {
+      width: 100%;
+      height: 120px;
+      background: rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      opacity: 0.4;
+      overflow: hidden;
+    }
+
+    .ad-card .ad-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 1;
+    }
+
+    .ad-card .ad-info {
+      padding: 10px 12px;
+    }
+
+    .ad-card .ad-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ad-card .ad-price {
+      font-size: 13px;
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .ad-card .ad-actions {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 6px;
+    }
+
+    .ad-card .ad-actions button {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      transition: transform 0.2s;
+    }
+
+    .ad-card .ad-actions button:hover { transform: scale(1.15); }
+
+    .btn-delete { background: var(--danger); color: var(--white); }
+    .btn-edit   { background: var(--primary); color: var(--black); }
+
+    .ads-empty {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 40px 0;
+      opacity: 0.5;
+      font-size: 15px;
+    }
+
+    .ads-loading {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 40px 0;
+      opacity: 0.6;
+    }
+
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid rgba(255,255,255,0.2);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ══════════════════════════════
+       SECTION 3 — UPLOAD AD
+    ══════════════════════════════ */
+    .upload-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .upload-grid .form-group { display: flex; flex-direction: column; gap: 6px; }
+
+    .upload-grid select,
+    .upload-grid input[type="text"],
+    .upload-grid input[type="number"],
+    .upload-grid textarea {
+      background: rgba(255,255,255,0.08);
+      border: 1.5px solid var(--glass-border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: var(--white);
+      font-family: "Poppins", sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.25s;
+      width: 100%;
+    }
+
+    .upload-grid select option { background: #222; }
+
+    .upload-grid select:focus,
+    .upload-grid input:focus,
+    .upload-grid textarea:focus { border-color: var(--primary); }
+
+    .upload-grid textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .photo-upload-zone {
+      grid-column: span 2;
+      border: 2px dashed var(--glass-border);
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      cursor: pointer;
+      transition: border-color 0.25s, background 0.25s;
+      min-height: 100px;
+      text-align: center;
+      gap: 8px;
+    }
+
+    .photo-upload-zone:hover {
+      border-color: var(--primary);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .photo-upload-zone i { font-size: 30px; opacity: 0.5; }
+    .photo-upload-zone span { font-size: 13px; opacity: 0.65; }
+    .photo-upload-zone input { display: none; }
+
+    .preview-thumbs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .preview-thumbs img {
+      width: 56px; height: 56px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1.5px solid var(--glass-border);
+    }
+
+    .upload-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .publish-btn {
+      padding: 11px 40px;
+      background: var(--primary);
+      border: none;
+      border-radius: 30px;
+      color: var(--black);
+      font-family: "Poppins", sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.25s, transform 0.15s;
+      letter-spacing: 0.5px;
+    }
+
+    .publish-btn:hover { background: var(--white); transform: scale(1.03); }
+    .publish-btn:active { transform: scale(0.97); }
+
+    /* ── Location ── */
+    .location-row {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 14px;
+      align-items: end;
+      background: rgba(255,255,255,0.04);
+      border: 1.5px solid var(--glass-border);
+      border-radius: 14px;
+      padding: 16px 18px;
+    }
+
+    .location-row .loc-label {
+      grid-column: 1 / -1;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0.8;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 2px;
+    }
+
+    .location-row .loc-label i { font-size: 16px; color: var(--primary); }
+
+    .detect-btn {
+      height: 42px;
+      padding: 0 16px;
+      background: rgba(198,195,195,0.15);
+      border: 1.5px solid var(--primary);
+      border-radius: 10px;
+      color: var(--white);
+      font-family: "Poppins", sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: background 0.25s;
+      flex-shrink: 0;
+    }
+
+    .detect-btn:hover { background: var(--primary); color: var(--black); }
+    .detect-btn i { font-size: 17px; }
+
+    .detect-btn.detecting i { animation: spin 0.8s linear infinite; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 28px; right: 28px;
+      background: rgba(30,30,30,0.9);
+      border: 1.5px solid var(--primary);
+      border-radius: 12px;
+      padding: 12px 22px;
+      font-size: 14px;
+      backdrop-filter: blur(12px);
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .profile-layout { flex-direction: column; }
+      .profile-form { grid-template-columns: 1fr; }
+      .upload-grid { grid-template-columns: 1fr 1fr; }
+      .photo-upload-zone { grid-column: span 2; }
+    }
+
+    @media (max-width: 600px) {
+      .main { padding: 16px; gap: 18px; }
+      nav { padding: 12px 16px; }
+      .upload-grid { grid-template-columns: 1fr; }
+      .photo-upload-zone { grid-column: span 1; }
+      .ads-grid { grid-template-columns: 1fr 1fr; }
+      .nav-logo { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-overlay">
+
+  <!-- ══════ NAVBAR ══════ -->
+  <nav>
+    <div class="nav-logo">Fix<span>kar</span></div>
+
+    <div class="search-wrap">
+      <i class='bx bx-search'></i>
+      <input type="text" placeholder="Search ads…">
+    </div>
+
+    <div class="nav-actions">
+      <button class="btn-ghost" onclick="window.location.href='registration.html'">Login</button>
+      <a href="#" title="Back Home"><i class='bx bx-home' style="font-size:22px; opacity:0.8;"></i></a>
+    </div>
+  </nav>
+
+  <div class="main">
+
+    <!-- ══════ SECTION 1: EDIT PROFILE ══════ -->
+    <div class="glass-card">
+      <div class="section-title"><i class='bx bx-user-circle'></i> Edit Profile</div>
+
+      <div class="profile-layout">
+        <!-- Avatar -->
+        <div class="avatar-wrap">
+          <div class="avatar-circle" onclick="document.getElementById('avatar-input').click()">
+            <i class='bx bx-user'></i>
+            <img id="avatar-preview" src="" alt="avatar">
+          </div>
+          <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="previewAvatar(this)">
+          <button class="select-btn" onclick="document.getElementById('avatar-input').click()">
+            <i class='bx bx-camera'></i> Select Photo
+          </button>
+        </div>
+
+        <!-- Form -->
+        <div class="profile-form">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="pf-fname" placeholder="John">
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="pf-lname" placeholder="Doe">
+          </div>
+          <div class="form-group full">
+            <label>Email Address</label>
+            <input type="email" id="pf-email" placeholder="john@example.com">
+          </div>
+          <div class="form-group full">
+            <label>New Password</label>
+            <div class="pw-wrap">
+              <input type="password" id="pf-pass" placeholder="Leave blank to keep current">
+              <i class='bx bx-show' id="pf-eye" onclick="togglePw('pf-pass','pf-eye')"></i>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="save-btn" onclick="saveProfile()">
+              <i class='bx bx-save'></i> Save Changes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ SECTION 2: MY ADS ══════ -->
+    <div class="glass-card">
+      <div class="ads-header">
+        <div class="section-title" style="margin-bottom:0"><i class='bx bx-purchase-tag-alt'></i> My Ads</div>
+        <span id="ads-count" style="font-size:13px;opacity:0.6;"></span>
+      </div>
+
+      <div class="ads-grid" id="ads-grid">
+        <div class="ads-loading">
+          <div class="spinner"></div>
+          <div>Loading your ads…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ SECTION 3: UPLOAD AD ══════ -->
+    <div class="glass-card">
+      <div class="section-title"><i class='bx bx-upload'></i> Upload Ad</div>
+
+      <div class="upload-grid">
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="up-title" placeholder="e.g. Wooden Chair">
+        </div>
+        <div class="form-group">
+          <label>Price (Rs)</label>
+          <input type="number" id="up-price" placeholder="1000">
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="up-category">
+            <option value="">Select Category</option>
+            <option>Furniture</option>
+            <option>Electronics</option>
+            <option>Vehicles</option>
+            <option>Clothing</option>
+            <option>Kitchen</option>
+            <option>Sports</option>
+            <option>Books</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Condition</label>
+          <select id="up-condition">
+            <option value="">Select Condition</option>
+            <option>New</option>
+            <option>Like New</option>
+            <option>Good</option>
+            <option>Fair</option>
+            <option>Poor</option>
+          </select>
+        </div>
+        <div class="form-group" style="grid-column: span 4;">
+          <label>Description</label>
+          <textarea id="up-desc" placeholder="Describe your item…"></textarea>
+        </div>
+
+        <!-- Location -->
+        <div class="location-row">
+          <div class="loc-label"><i class='bx bx-map'></i> Location</div>
+
+          <div class="form-group" style="margin:0;">
+            <label>Province</label>
+            <select id="up-province" onchange="updateCities()">
+              <option value="">Select Province</option>
+              <option>Punjab</option>
+              <option>Sindh</option>
+              <option>KPK</option>
+              <option>Balochistan</option>
+              <option>Gilgit-Baltistan</option>
+              <option>AJK</option>
+              <option>Islamabad (ICT)</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin:0;">
+            <label>City</label>
+            <select id="up-city" onchange="updateAreas()" disabled>
+              <option value="">Select City</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin:0;">
+            <label>Area / Neighbourhood</label>
+            <select id="up-area" disabled>
+              <option value="">Select Area</option>
+            </select>
+          </div>
+
+          <button class="detect-btn" id="detect-btn" onclick="detectLocation()">
+            <i class='bx bx-current-location'></i> Detect
+          </button>
+        </div>
+        <div class="photo-upload-zone" onclick="document.getElementById('photo-input').click()">
+          <i class='bx bx-image-add'></i>
+          <span>Click to upload photos</span>
+          <div class="preview-thumbs" id="photo-previews"></div>
+          <input type="file" id="photo-input" accept="image/*" multiple onchange="previewPhotos(this)">
+        </div>
+
+        <div class="upload-actions">
+          <button class="publish-btn" onclick="publishAd()">
+            <i class='bx bx-paper-plane'></i> Publish
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ─── Mock DB (simulates a backend fetch) ─── */
+  const MOCK_ADS = [
+    { id: 1, title: "Wooden Chair",   price: 1000, category: "Furniture",    condition: "Good",     image: null },
+    { id: 2, title: "Mobile Screen",  price: 5000, category: "Electronics",  condition: "Like New", image: null },
+    { id: 3, title: "Fridge",         price:10000, category: "Electronics",  condition: "Good",     image: null },
+  ];
+
+  let adsDB = [...MOCK_ADS]; // local store
+
+  /* ─── Location Data ─── */
+  const LOCATION_DATA = {
+    'Punjab':           { 'Lahore': ['Gulberg','DHA','Model Town','Johar Town','Bahria Town','Cantt','Iqbal Town','Wapda Town'],
+                          'Rawalpindi': ['Saddar','Bahria Town','DHA','Chaklala','Westridge','Satellite Town'],
+                          'Faisalabad': ['Madina Town','Jinnah Colony','Gulberg','Canal Road','Samanabad'],
+                          'Multan': ['Gulgasht','Shah Rukn-e-Alam','Cantt','Bosan Road','New Multan'],
+                          'Gujranwala': ['Satellite Town','Model Town','Civil Lines','Peoples Colony'] },
+    'Sindh':            { 'Karachi': ['DHA','Clifton','Gulshan-e-Iqbal','PECHS','Nazimabad','Korangi','Malir','Saddar','North Nazimabad','Orangi Town'],
+                          'Hyderabad': ['Latifabad','Qasimabad','City','Hirabad','Cantt'],
+                          'Sukkur': ['Military Road','Rohri','Airport Road'],
+                          'Larkana': ['Dokri Road','New Larkana','Shikarpur Road'] },
+    'KPK':              { 'Peshawar': ['Hayatabad','University Road','Cantonment','Saddar','Ring Road'],
+                          'Abbottabad': ['Mandian','Cantt','Mirpur'],
+                          'Swat': ['Mingora','Saidu Sharif','Matta'],
+                          'Mardan': ['Grain Market','Cantt','Sherpao'] },
+    'Balochistan':      { 'Quetta': ['Satellite Town','Jinnah Town','Cantt','Airport Road','Sariab Road'],
+                          'Gwadar': ['New Town','Fish Harbour','Airport Road'],
+                          'Turbat': ['City Center','Airport Road'] },
+    'Gilgit-Baltistan': { 'Gilgit': ['Jutial','Konodas','Airport Road','Nomal'],
+                          'Skardu': ['Sadpara Road','Naya Bazar','Airport Road'] },
+    'AJK':              { 'Muzaffarabad': ['Chattar','Dhani','Hari Gari','Kail Road'],
+                          'Mirpur': ['Allama Iqbal Colony','New City','Cantt'] },
+    'Islamabad (ICT)':  { 'Islamabad': ['F-6','F-7','F-8','F-10','F-11','G-9','G-10','G-11','I-8','I-10','DHA','Bahria Town','Blue Area','E-11'] }
+  };
+
+  function updateCities() {
+    const province = document.getElementById('up-province').value;
+    const cityEl   = document.getElementById('up-city');
+    const areaEl   = document.getElementById('up-area');
+
+    cityEl.innerHTML = '<option value="">Select City</option>';
+    areaEl.innerHTML = '<option value="">Select Area</option>';
+    areaEl.disabled  = true;
+
+    if (province && LOCATION_DATA[province]) {
+      Object.keys(LOCATION_DATA[province]).forEach(city => {
+        cityEl.innerHTML += `<option>${city}</option>`;
+      });
+      cityEl.disabled = false;
+    } else {
+      cityEl.disabled = true;
+    }
+  }
+
+  function updateAreas() {
+    const province = document.getElementById('up-province').value;
+    const city     = document.getElementById('up-city').value;
+    const areaEl   = document.getElementById('up-area');
+
+    areaEl.innerHTML = '<option value="">Select Area</option>';
+
+    if (province && city && LOCATION_DATA[province]?.[city]) {
+      LOCATION_DATA[province][city].forEach(area => {
+        areaEl.innerHTML += `<option>${area}</option>`;
+      });
+      areaEl.disabled = false;
+    } else {
+      areaEl.disabled = true;
+    }
+  }
+
+  function detectLocation() {
+    const btn = document.getElementById('detect-btn');
+    if (!navigator.geolocation) { showToast('Geolocation not supported.', true); return; }
+
+    btn.classList.add('detecting');
+    btn.querySelector('span') && (btn.querySelector('span').textContent = 'Detecting…');
+
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        // Default to Karachi/Sindh for demo — in production reverse-geocode with an API
+        document.getElementById('up-province').value = 'Sindh';
+        updateCities();
+        setTimeout(() => {
+          document.getElementById('up-city').value = 'Karachi';
+          updateAreas();
+          setTimeout(() => {
+            document.getElementById('up-area').value = 'DHA';
+          }, 50);
+        }, 50);
+        btn.classList.remove('detecting');
+        showToast(`Location detected: Karachi, Sindh`);
+      },
+      err => {
+        btn.classList.remove('detecting');
+        showToast('Could not detect location. Please select manually.', true);
+      }
+    );
+  }
+
+  /* ─── Fetch & render ads ─── */
+  function fetchAds() {
+    const grid = document.getElementById('ads-grid');
+    grid.innerHTML = `<div class="ads-loading"><div class="spinner"></div><div>Loading your ads…</div></div>`;
+
+    // Simulate network delay
+    setTimeout(() => {
+      renderAds(adsDB);
+    }, 900);
+  }
+
+  function renderAds(ads) {
+    const grid  = document.getElementById('ads-grid');
+    const count = document.getElementById('ads-count');
+    count.textContent = ads.length + ' ad' + (ads.length !== 1 ? 's' : '');
+
+    if (!ads.length) {
+      grid.innerHTML = `<div class="ads-empty"><i class='bx bx-ghost' style="font-size:40px;display:block;margin-bottom:8px;"></i>No ads yet. Upload your first one below!</div>`;
+      return;
+    }
+
+    const icons = { Furniture:'bx-chair', Electronics:'bx-laptop', Vehicles:'bx-car',
+                    Clothing:'bx-hanger', Kitchen:'bx-bowl-hot', Sports:'bx-football',
+                    Books:'bx-book', Other:'bx-box' };
+
+    grid.innerHTML = ads.map(ad => `
+      <div class="ad-card" id="ad-${ad.id}">
+        <div class="ad-img">
+          ${ad.image
+            ? `<img src="${ad.image}" alt="${ad.title}">`
+            : `<i class='bx ${icons[ad.category] || 'bx-box'}'></i>`}
+        </div>
+        <div class="ad-actions">
+          <button class="btn-edit" title="Edit" onclick="editAd(${ad.id})"><i class='bx bx-edit-alt'></i></button>
+          <button class="btn-delete" title="Delete" onclick="deleteAd(${ad.id})"><i class='bx bx-x'></i></button>
+        </div>
+        <div class="ad-info">
+          <div class="ad-title">${ad.title}</div>
+          <div class="ad-price">Rs ${ad.price.toLocaleString()}</div>
+          ${ad.location ? `<div style="font-size:11px;opacity:0.55;margin-top:3px;"><i class='bx bx-map-pin' style="vertical-align:middle;font-size:12px;"></i> ${ad.location}</div>` : ''}
+        </div>
+      </div>`).join('');
+  }
+
+  function deleteAd(id) {
+    const card = document.getElementById('ad-' + id);
+    if (card) { card.style.opacity = '0'; card.style.transform = 'scale(0.85)'; card.style.transition = '0.3s'; }
+    setTimeout(() => {
+      adsDB = adsDB.filter(a => a.id !== id);
+      renderAds(adsDB);
+      showToast('Ad removed.');
+    }, 300);
+  }
+
+  function editAd(id) {
+    const ad = adsDB.find(a => a.id === id);
+    if (!ad) return;
+    document.getElementById('up-title').value    = ad.title;
+    document.getElementById('up-price').value    = ad.price;
+    document.getElementById('up-category').value = ad.category;
+    document.getElementById('up-condition').value= ad.condition;
+    document.querySelector('.upload-grid').scrollIntoView({ behavior: 'smooth' });
+    showToast('Editing "' + ad.title + '" — make changes and publish.');
+    adsDB = adsDB.filter(a => a.id !== id);
+    renderAds(adsDB);
+  }
+
+  /* ─── Publish Ad ─── */
+  function publishAd() {
+    const title     = document.getElementById('up-title').value.trim();
+    const price     = parseFloat(document.getElementById('up-price').value);
+    const category  = document.getElementById('up-category').value;
+    const condition = document.getElementById('up-condition').value;
+
+    if (!title)     { showToast('Please enter a title.', true); return; }
+    if (!price || isNaN(price)) { showToast('Please enter a valid price.', true); return; }
+    if (!category)  { showToast('Please select a category.', true); return; }
+    if (!condition) { showToast('Please select condition.', true); return; }
+
+    const province  = document.getElementById('up-province').value;
+    const city      = document.getElementById('up-city').value;
+    const area      = document.getElementById('up-area').value;
+    const location  = [area, city, province].filter(Boolean).join(', ') || null;
+
+    const newAd = {
+      id: Date.now(),
+      title, price, category, condition, location,
+      image: previewedImage || null
+    };
+
+    adsDB.unshift(newAd);
+    renderAds(adsDB);
+
+    // Reset form
+    ['up-title','up-price','up-desc'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('up-category').value  = '';
+    document.getElementById('up-condition').value = '';
+    document.getElementById('up-province').value  = '';
+    document.getElementById('up-city').value      = '';
+    document.getElementById('up-city').disabled   = true;
+    document.getElementById('up-area').value      = '';
+    document.getElementById('up-area').disabled   = true;
+    document.getElementById('photo-previews').innerHTML = '';
+    previewedImage = null;
+
+    showToast('Ad published successfully! 🎉');
+    document.getElementById('ads-grid').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  /* ─── Photo Preview ─── */
+  let previewedImage = null;
+
+  function previewPhotos(input) {
+    const container = document.getElementById('photo-previews');
+    container.innerHTML = '';
+    const files = Array.from(input.files);
+    files.forEach((file, i) => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        if (i === 0) previewedImage = e.target.result;
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        container.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  /* ─── Avatar Preview ─── */
+  function previewAvatar(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.getElementById('avatar-preview');
+      img.src = e.target.result;
+      img.style.display = 'block';
+      img.previousElementSibling.style.display = 'none'; // hide icon
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /* ─── Save Profile ─── */
+  function saveProfile() {
+    showToast('Profile saved successfully!');
+  }
+
+  /* ─── Toggle Password ─── */
+  function togglePw(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon  = document.getElementById(iconId);
+    const hidden = input.type === 'password';
+    input.type = hidden ? 'text' : 'password';
+    icon.className = hidden ? 'bx bx-hide' : 'bx bx-show';
+  }
+
+  /* ─── Toast ─── */
+  function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.borderColor = isError ? '#ff6b6b' : 'var(--primary)';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  /* ─── Init ─── */
+  fetchAds();
+</script>
+</body>
+</html>
