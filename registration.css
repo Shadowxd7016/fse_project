@@ -1,182 +1,320 @@
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
-}
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
 
-:root {
-  --primary-color: #c6c3c3;
-  --second-color: #ffffff;
-  --black-color: #000000;
-}
+    :root {
+      --primary-color: #c6c3c3;
+      --second-color: #ffffff;
+      --black-color: #000000;
+    }
 
-body {
-  background-image: url("https://codingstella.com/wp-content/uploads/2024/01/download-6-scaled.jpeg");
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-}
+    body {
+      background-image: url("registration_bg.png");
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
 
-a {
-  text-decoration: none;
-  color: var(--second-color);
-}
+    a {
+      text-decoration: none;
+      color: var(--second-color);
+    }
 
-a:hover {
-  text-decoration: underline;
-}
+    a:hover {
+      text-decoration: underline;
+    }
 
-.wrapper {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: rgba(0, 0, 0, 0.2);
-}
+    .wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: rgba(0, 0, 0, 0.2);
+    }
 
-.login_box {
-  position: relative;
-  width: 450px;
-  backdrop-filter: blur(25px);
-  border: 2px solid var(--primary-color);
-  border-radius: 15px;
-  padding: 7.5em 2.5em 4em 2.5em;
-  color: var(--second-color);
-  box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.2);
-}
+    /* ── Card container ── */
+    .card-container {
+      perspective: 1200px;
+      width: 450px;
+    }
 
-.login-header {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--primary-color);
-  width: 140px;
-  height: 70px;
-  border-radius: 0 0 20px 20px;
-}
+    .card-inner {
+      position: relative;
+      width: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+    }
 
-.login-header span {
-  font-size: 30px;
-  color: var(--black-color);
-}
+    .card-container.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
 
-.login-header::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -30px;
-  width: 30px;
-  height: 30px;
-  border-top-right-radius: 50%;
-  background: transparent;
-  box-shadow: 15px 0 0 0 var(--primary-color);
-}
+    /* ── Shared face styles ── */
+    .card-face {
+      width: 100%;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 2px solid var(--primary-color);
+      border-radius: 15px;
+      color: var(--second-color);
+      box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.2);
+    }
 
-.login-header::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: -30px;
-  width: 30px;
-  height: 30px;
-  border-top-left-radius: 50%;
-  background: transparent;
-  box-shadow: -15px 0 0 0 var(--primary-color); /* Removed space before --primary-color */
-}
+    .card-front {
+      padding: 7.5em 2.5em 4em 2.5em;
+    }
 
-.input_box {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  margin: 20px 0;
-}
+    .card-back {
+      padding: 7.5em 2.5em 4em 2.5em;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: rotateY(180deg);
+    }
 
-.input-field {
-  width: 100%;
-  height: 55px;
-  font-size: 16px;
-  background: transparent;
-  color: var(--second-color);
-  padding-inline: 20px 50px;
-  border: 2px solid var(--primary-color);
-  border-radius: 30px;
-  outline: none;
-}
+    /* ── Header tab ── */
+    .login-header {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--primary-color);
+      width: 160px;
+      height: 70px;
+      border-radius: 0 0 20px 20px;
+      white-space: nowrap;
+    }
 
-#user {
-  margin-bottom: 10px;
-}
+    .login-header span {
+      font-size: 26px;
+      color: var(--black-color);
+      font-weight: 600;
+    }
 
-.label {
-  position: absolute;
-  top: 15px;
-  left: 20px;
-  transition: 0.2s;
-}
+    .login-header::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -30px;
+      width: 30px;
+      height: 30px;
+      border-top-right-radius: 50%;
+      background: transparent;
+      box-shadow: 15px 0 0 0 var(--primary-color);
+    }
 
-.input-field:focus ~ .label,
-.input-field:valid .label {
-  /* Added missing closing brace here */
-  position: absolute;
-  top: -10px;
-  left: 20px;
-  font-size: 14px;
-  background-color: var(--primary-color);
-  border-radius: 30px;
-  color: var(--black-color);
-  padding: 0 10px;
-} /* Closed the missing brace */
+    .login-header::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: -30px;
+      width: 30px;
+      height: 30px;
+      border-top-left-radius: 50%;
+      background: transparent;
+      box-shadow: -15px 0 0 0 var(--primary-color);
+    }
 
-.icon {
-  position: absolute;
-  top: 18px;
-  right: 25px;
-  font-size: 20px;
-}
+    /* ── Inputs ── */
+    .input_box {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      margin: 20px 0;
+    }
 
-.remember-forgot {
-  display: flex;
-  justify-content: space-between;
-  font-size: 15px;
-}
+    .input-field {
+      width: 100%;
+      height: 55px;
+      font-size: 16px;
+      background: transparent;
+      color: var(--second-color);
+      padding-inline: 20px 50px;
+      border: 2px solid var(--primary-color);
+      border-radius: 30px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
 
-.input-submit {
-  width: 100%;
-  height: 50px;
-  background: #ececec;
-  font-size: 16px;
-  font-weight: 500;
-  border: none;
-  border-radius: 30px;
-  cursor: pointer;
-  transition: 0.3s;
-}
+    .input-field:focus {
+      border-color: var(--second-color);
+    }
 
-.input-submit:hover {
-  background: var(--second-color);
-}
+    .input-field::placeholder {
+      color: transparent;
+    }
 
-.register {
-  text-align: center;
-}
+    .label {
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      transition: 0.2s;
+      pointer-events: none;
+    }
 
-.register a {
-  font-weight: 500;
-}
+    .input-field:focus ~ .label,
+    .input-field:valid ~ .label {
+      position: absolute;
+      top: -10px;
+      left: 20px;
+      font-size: 14px;
+      background-color: var(--primary-color);
+      border-radius: 30px;
+      color: var(--black-color);
+      padding: 0 10px;
+    }
 
-@media only screen and (max-width: 564px) {
-  .wrapper {
-    padding: 20px;
-  }
+    .icon {
+      position: absolute;
+      top: 18px;
+      right: 25px;
+      font-size: 20px;
+    }
 
-  .login_box {
-    padding: 7.5em 1.5em 4em 1.5em;
-  }
-}
+    /* ── Remember / Forgot ── */
+    .remember-forgot {
+      display: flex;
+      justify-content: space-between;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    /* ── Submit button ── */
+    .input-submit {
+      width: 100%;
+      height: 50px;
+      background: #ececec;
+      font-size: 16px;
+      font-weight: 500;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.15s;
+    }
+
+    .input-submit:hover {
+      background: var(--second-color);
+      transform: scale(1.02);
+    }
+
+    .input-submit:active {
+      transform: scale(0.98);
+    }
+
+    /* ── Register / Login switch ── */
+    .register, .login-link {
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    .register a, .login-link a {
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* ── Password strength bar ── */
+    .strength-bar-wrap {
+      height: 4px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.2);
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .strength-bar {
+      height: 100%;
+      width: 0%;
+      border-radius: 4px;
+      transition: width 0.4s, background 0.4s;
+    }
+
+    .strength-label {
+      font-size: 12px;
+      margin-top: 4px;
+      color: rgba(255,255,255,0.75);
+      min-height: 16px;
+    }
+
+    /* ── Name row ── */
+    .name-row {
+      display: flex;
+      gap: 14px;
+    }
+
+    .name-row .input_box {
+      flex: 1;
+    }
+
+    /* ── Error hint ── */
+    .error-hint {
+      font-size: 12px;
+      color: #ff8080;
+      margin-top: 4px;
+      min-height: 16px;
+      padding-left: 8px;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+      color: rgba(255,255,255,0.5);
+      font-size: 13px;
+    }
+
+    .divider::before, .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.25);
+    }
+
+    /* ── Terms checkbox ── */
+    .terms-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 4px;
+    }
+
+    .terms-row input[type="checkbox"] {
+      margin-top: 3px;
+      accent-color: var(--primary-color);
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    @media only screen and (max-width: 564px) {
+      .wrapper {
+        padding: 20px;
+      }
+
+      .card-container {
+        width: 100%;
+      }
+
+      .card-front, .card-back {
+        padding: 7.5em 1.5em 4em 1.5em;
+      }
+
+      .name-row {
+        flex-direction: column;
+        gap: 0;
+      }
+    }

@@ -1,53 +1,196 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Modern Login Form | CodingStella </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login & Register</title>
   <link rel='stylesheet' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'>
-<link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Poppins&amp;display=swap'><link rel="stylesheet" href="registration.css">
-
+  <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap'>
+  <link rel='stylesheet' href='registration.css'>
 </head>
 <body>
-<!-- partial:index.partial.html -->
+
 <div class="wrapper">
-  <div class="login_box">
-    <div class="login-header">
-      <span>Login</span>
-    </div>
+  <div class="card-container" id="cardContainer">
+    <div class="card-inner">
 
-    <div class="input_box">
-      <input type="text" id="user" class="input-field" required>
-      <label for="user" class="label">Username</label>
-      <i class="bx bx-user icon"></i>
-    </div>
+      <!-- ════ LOGIN FACE ════ -->
+      <div class="card-face card-front">
+        <div class="login-header"><span>Login</span></div>
 
-    <div class="input_box">
-      <input type="password" id="pass" class="input-field" required>
-      <label for="pass" class="label">Password</label>
-      <i class="bx bx-lock-alt icon"></i>
-    </div>
+        <div class="input_box">
+          <input type="text" id="login-user" class="input-field" required autocomplete="username">
+          <label for="login-user" class="label">Username or Email</label>
+          <i class="bx bx-user icon"></i>
+        </div>
 
-    <div class="remember-forgot">
-      <div class="remember-me">
-        <input type="checkbox" id="remember">
-        <label for="remember">Remember me</label>
+        <div class="input_box">
+          <input type="password" id="login-pass" class="input-field" required autocomplete="current-password">
+          <label for="login-pass" class="label">Password</label>
+          <i class="bx bx-lock-alt icon" id="toggleLoginPass" style="cursor:pointer;" title="Show/hide"></i>
+        </div>
+
+        <div class="remember-forgot">
+          <div class="remember-me" style="display:flex;align-items:center;gap:6px;">
+            <input type="checkbox" id="remember" style="accent-color:var(--primary-color);cursor:pointer;">
+            <label for="remember" style="cursor:pointer;">Remember me</label>
+          </div>
+          <div class="forgot">
+            <a href="#">Forgot password?</a>
+          </div>
+        </div>
+
+        <div class="input_box">
+          <input type="submit" class="input-submit" value="Login">
+        </div>
+
+        <div class="register">
+          <span>Don't have an account? <a href="#" onclick="flip(true); return false;">Register</a></span>
+        </div>
       </div>
 
-      <div class="forgot">
-        <a href="#">Forgot password?</a>
+      <!-- ════ REGISTER FACE ════ -->
+      <div class="card-face card-back">
+        <div class="login-header"><span>Register</span></div>
+
+        <div class="name-row">
+          <div class="input_box">
+            <input type="text" id="reg-fname" class="input-field" required autocomplete="given-name">
+            <label for="reg-fname" class="label">First Name</label>
+            <i class="bx bx-user icon"></i>
+          </div>
+          <div class="input_box">
+            <input type="text" id="reg-lname" class="input-field" required autocomplete="family-name">
+            <label for="reg-lname" class="label">Last Name</label>
+          </div>
+        </div>
+
+        <div class="input_box">
+          <input type="email" id="reg-email" class="input-field" required autocomplete="email">
+          <label for="reg-email" class="label">Email Address</label>
+          <i class="bx bx-envelope icon"></i>
+          <div class="error-hint" id="email-hint"></div>
+        </div>
+
+        <div class="input_box">
+          <input type="password" id="reg-pass" class="input-field" required autocomplete="new-password" oninput="checkStrength(this.value)">
+          <label for="reg-pass" class="label">Password</label>
+          <i class="bx bx-lock-alt icon" id="toggleRegPass" style="cursor:pointer;" title="Show/hide"></i>
+          <div class="strength-bar-wrap"><div class="strength-bar" id="strengthBar"></div></div>
+          <div class="strength-label" id="strengthLabel"></div>
+        </div>
+
+        <div class="input_box">
+          <input type="password" id="reg-pass2" class="input-field" required autocomplete="new-password">
+          <label for="reg-pass2" class="label">Confirm Password</label>
+          <i class="bx bx-lock-check icon"></i>
+          <div class="error-hint" id="pass-hint"></div>
+        </div>
+
+        <div class="terms-row">
+          <input type="checkbox" id="terms">
+          <label for="terms">I agree to the <a href="#" style="color:var(--second-color);font-weight:500;">Terms &amp; Conditions</a> and <a href="#" style="color:var(--second-color);font-weight:500;">Privacy Policy</a>.</label>
+        </div>
+
+        <div class="input_box">
+          <input type="submit" class="input-submit" value="Create Account" onclick="validateRegister(event)">
+        </div>
+
+        <div class="login-link">
+          <span>Already have an account? <a href="#" onclick="flip(false); return false;">Login</a></span>
+        </div>
       </div>
-    </div>
 
-    <div class="input_box">
-      <input type="submit" class="input-submit" value="Login">
-    </div>
+    </div><!-- card-inner -->
+  </div><!-- card-container -->
+</div><!-- wrapper -->
 
-    <div class="register">
-      <span>Don't have an account? <a href="#">Register</a></span>
-    </div>
-  </div>
-</div>
-<!-- partial -->
-  
+<script>
+  /* ── Flip ── */
+  function flip(toRegister) {
+    document.getElementById('cardContainer').classList.toggle('flipped', toRegister);
+  }
+
+  /* ── Toggle password visibility ── */
+  function togglePass(inputId, iconEl) {
+    const inp = document.getElementById(inputId);
+    const show = inp.type === 'password';
+    inp.type = show ? 'text' : 'password';
+    iconEl.className = show ? 'bx bx-show icon' : 'bx bx-lock-alt icon';
+    iconEl.style.cursor = 'pointer';
+  }
+
+  document.getElementById('toggleLoginPass').addEventListener('click', function() {
+    togglePass('login-pass', this);
+  });
+  document.getElementById('toggleRegPass').addEventListener('click', function() {
+    togglePass('reg-pass', this);
+  });
+
+  /* ── Password strength ── */
+  function checkStrength(val) {
+    const bar = document.getElementById('strengthBar');
+    const label = document.getElementById('strengthLabel');
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+
+    const levels = [
+      { pct: '0%',   color: 'transparent', text: '' },
+      { pct: '25%',  color: '#ff4d4d',     text: 'Weak' },
+      { pct: '50%',  color: '#ffa500',     text: 'Fair' },
+      { pct: '75%',  color: '#f0d800',     text: 'Good' },
+      { pct: '100%', color: '#4caf50',     text: 'Strong 💪' },
+    ];
+    const l = levels[score];
+    bar.style.width = l.pct;
+    bar.style.background = l.color;
+    label.textContent = val.length ? l.text : '';
+  }
+
+  /* ── Register validation ── */
+  function validateRegister(e) {
+    e.preventDefault();
+    const email    = document.getElementById('reg-email');
+    const pass     = document.getElementById('reg-pass');
+    const pass2    = document.getElementById('reg-pass2');
+    const terms    = document.getElementById('terms');
+    const emailHint = document.getElementById('email-hint');
+    const passHint  = document.getElementById('pass-hint');
+    let valid = true;
+
+    // Email
+    const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRx.test(email.value)) {
+      emailHint.textContent = 'Please enter a valid email address.';
+      valid = false;
+    } else {
+      emailHint.textContent = '';
+    }
+
+    // Password match
+    if (pass.value !== pass2.value) {
+      passHint.textContent = 'Passwords do not match.';
+      valid = false;
+    } else if (pass.value.length < 8) {
+      passHint.textContent = 'Password must be at least 8 characters.';
+      valid = false;
+    } else {
+      passHint.textContent = '';
+    }
+
+    // Terms
+    if (!terms.checked) {
+      alert('Please accept the Terms & Conditions to continue.');
+      valid = false;
+    }
+
+    if (valid) {
+      alert('Account created successfully! 🎉');
+    }
+  }
+</script>
 </body>
 </html>
