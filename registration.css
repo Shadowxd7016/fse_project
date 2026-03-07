@@ -12,8 +12,8 @@
     }
 
     body {
-      background-image: url("registration_bg.png");
-      background-position: center;
+    background-image: url("registration_bg.png");
+    background-position:center top;
       background-size: cover;
       background-repeat: no-repeat;
       background-attachment: fixed;
