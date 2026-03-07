@@ -1,265 +1,196 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FixKar - Authentication</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-        
-        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        
-        .outline-text {
-            color: white;
-            -webkit-text-stroke: 1.5px black;
-            font-weight: 800;
-            line-height: 1;
-        }
-
-        .input-field {
-            border: 1.5px solid black;
-            border-radius: 0.75rem;
-            padding: 0.6rem 1rem;
-            width: 100%;
-            outline: none;
-            font-size: 0.875rem;
-        }
-
-        .btn-black {
-            background: black;
-            color: white;
-            border-radius: 9999px;
-            padding: 0.8rem 2rem;
-            font-weight: 600;
-            width: 100%;
-            transition: all 0.3s ease;
-        }
-
-        .btn-social {
-            border: 1.5px solid black;
-            border-radius: 9999px;
-            padding: 0.5rem 1rem;
-            width: 100%;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        /* Slide Transition Logic */
-        #slider-container {
-            display: flex;
-            transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
-            width: 200%;
-        }
-        .page-view {
-            width: 50%;
-            flex-shrink: 0;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login & Register</title>
+  <link rel='stylesheet' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'>
+  <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap'>
+  <link rel='stylesheet' href='registration.css'>
 </head>
-<body class="bg-white">
+<body>
 
-    <div id="slider-container">
-        
-        <div class="page-view min-h-screen flex flex-col md:flex-row p-8 md:p-20 items-center justify-center gap-12">
-            <div class="max-w-md">
-                <div class="text-4xl font-bold italic text-red-600 flex items-center mb-6">
-                    <img src="Picture1.png" alt="logo" class="w-60 h-25" style="padding: 0% 5%;margin-left: 14%;">
-                    <span class="ml-2 text-xl not-italic text-gray-400"></span>
-                </div>
-                <h1 class="text-6xl outline-text mb-6">SELL FAST.<br>BUY EASY.<br>GO GREEN.</h1>
-                <div class="border-2 border-black p-4 rounded-xl max-w-xs">
-                    <p class="font-bold text-sm">Pakistan's most trusted eco-friendly marketplace.</p>
-                </div>
-                <div class="mt-20 flex gap-4">
-                    <div class="border-2 border-black p-4 rounded-xl w-40">
-                        <p class="font-extrabold">10k+</p>
-                        <p class="text-[10px] uppercase text-gray-500">Verified Sellers</p>
-                    </div>
-                    <div class="border-2 border-black p-4 rounded-xl w-40">
-                        <p class="font-extrabold">100%</p>
-                        <p class="text-[10px] uppercase text-gray-500">Secure Trade</p>
-                    </div>
-                </div>
-            </div>
+<div class="wrapper">
+  <div class="card-container" id="cardContainer">
+    <div class="card-inner">
 
-            <div class="max-w-sm w-full space-y-4">
-                <h2 class="text-2xl font-extrabold uppercase">Join FixKar</h2>
-                <p class="text-[10px] font-bold text-gray-400 uppercase -mt-2">Create your secure account</p>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-[10px] font-bold uppercase">First Name</label>
-                        <input type="text" placeholder="John" id="first-name" class="input-field">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold uppercase">Last Name</label>
-                        <input type="text" placeholder="Doe" id="last-name" class="input-field">
-                    </div>
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold uppercase">Email Address</label>
-                    <input type="email" placeholder="john@example.com" id="reg-email" required class="input-field">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold uppercase">Contact Number</label>
-                    <input type="text" placeholder="0300-1234567" id="reg-contact" class="input-field" required>
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold uppercase">Password</label>
-                    <input type="password" placeholder="........" id="reg-password" class="input-field">
-                </div>
+      <!-- ════ LOGIN FACE ════ -->
+      <div class="card-face card-front">
+        <div class="login-header"><span>Login</span></div>
 
-                <button onclick="handleSignUp()" class="btn-black mt-4">START SELLING &rarr;</button>
-
-                <div class="relative py-4 flex items-center">
-                    <div class="flex-grow border-t border-gray-300"></div>
-                    <span class="flex-shrink mx-4 text-[10px] font-bold text-gray-400 uppercase">Verified Social Sign-on</span>
-                    <div class="flex-grow border-t border-gray-300"></div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <button class="btn-social">Google</button>
-                    <button class="btn-social">Facebook</button>
-                </div>
-
-                <p class="text-center text-[10px] font-bold text-gray-400 mt-6">
-                    MEMBER ALREADY? <button onclick="slideToLogin()" class="underline hover:text-black">LOG IN HERE</button>
-                </p>
-            </div>
+        <div class="input_box">
+          <input type="text" id="login-user" class="input-field" required autocomplete="username">
+          <label for="login-user" class="label">Username or Email</label>
+          <i class="bx bx-user icon"></i>
         </div>
 
-        <div class="page-view min-h-screen flex flex-col md:flex-row-reverse p-8 md:p-20 items-center justify-center gap-12">
-            <div class="max-w-md">
-                <div class="text-4xl font-bold italic text-red-600 flex items-center mb-6">
-                    <img src="Picture1.png" alt="logo" class="w-60 h-25" style="padding: 0% 5%;margin-left: 12%;">
-                    <span class="ml-2 text-xl not-italic text-gray-400"></span>
-                </div>
-                <h1 class="text-6xl outline-text mb-6">WELCOME<br>BACK TO<br>THE HUB.</h1>
-                <div class="border-2 border-black p-4 rounded-xl max-w-xs">
-                    <p class="font-bold text-sm">Manage your listings and chat with buyers.</p>
-                </div>
-                <div class="mt-12">
-                   <span class="bg-black text-white text-[10px] px-3 py-1 rounded-md font-bold">⚡ Top Rated Marketplace</span>
-                </div>
-            </div>
-
-            <div class="max-w-sm w-full space-y-4">
-                <h2 class="text-2xl font-extrabold uppercase">Log In</h2>
-                <p class="text-[10px] font-bold text-gray-400 uppercase -mt-2">Enter your credentials to access Fixkar</p>
-                
-                <div>
-                    <label class="text-[10px] font-bold uppercase">Email Address</label>
-                    <input type="email" placeholder="name@company.com" id="login-email" class="input-field">
-                </div>
-                <div class="relative">
-                    <div class="flex justify-between">
-                        <label class="text-[10px] font-bold uppercase">Password</label>
-                        <a href="#" class="text-[10px] font-bold uppercase underline">Forgot?</a>
-                    </div>
-                    <input type="password" placeholder="........" id="login-password" class="input-field">
-                    <span class="absolute right-4 bottom-3 text-[10px] font-bold text-gray-400 cursor-pointer">SHOW</span>
-                </div>
-
-                <div class="flex items-center space-x-2">
-                    <input type="checkbox" id="keep" class="accent-black">
-                    <label for="keep" class="text-[10px] font-bold text-gray-400 uppercase">Keep me logged in</label>
-                </div>
-
-                <button onclick="handleLogin()" class="btn-black mt-4">LOG IN &rarr;</button>
-
-                <div class="relative py-4 flex items-center">
-                    <div class="flex-grow border-t border-gray-300"></div>
-                    <span class="flex-shrink mx-4 text-[10px] font-bold text-gray-400 uppercase">Or use social login</span>
-                    <div class="flex-grow border-t border-gray-300"></div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <button class="btn-social">Google</button>
-                    <button class="btn-social">Facebook</button>
-                </div>
-
-                <p class="text-center text-[10px] font-bold text-gray-400 mt-6">
-                    DON'T HAVE AN ACCOUNT? <button onclick="slideToJoin()" class="underline hover:text-black">REGISTER FOR FREE</button>
-                </p>
-            </div>
+        <div class="input_box">
+          <input type="password" id="login-pass" class="input-field" required autocomplete="current-password">
+          <label for="login-pass" class="label">Password</label>
+          <i class="bx bx-lock-alt icon" id="toggleLoginPass" style="cursor:pointer;" title="Show/hide"></i>
         </div>
 
-    </div>
+        <div class="remember-forgot">
+          <div class="remember-me" style="display:flex;align-items:center;gap:6px;">
+            <input type="checkbox" id="remember" style="accent-color:var(--primary-color);cursor:pointer;">
+            <label for="remember" style="cursor:pointer;">Remember me</label>
+          </div>
+          <div class="forgot">
+            <a href="#">Forgot password?</a>
+          </div>
+        </div>
 
-    <script>
-    
-    // Initialize Supabase
-      const _supabase = supabase.createClient('https://lvfbcbgmosfrpwvmrfhp.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2ZmJjYmdtb3NmcnB3dm1yZmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0Mjc3MTEsImV4cCI6MjA4OTAwMzcxMX0.CMvOjwLs_1sDunNpphV5niv668Y459TwfzxDLioXx8c');
-      const slider = document.getElementById('slider-container');
+        <div class="input_box">
+          <input type="submit" class="input-submit" value="Login">
+        </div>
 
-      function slideToLogin() {
-          slider.style.transform = 'translateX(-50%)';
-      }
+        <div class="register">
+          <span>Don't have an account? <a href="#" onclick="flip(true); return false;">Register</a></span>
+        </div>
+      </div>
 
-      function slideToJoin() {
-          slider.style.transform = 'translateX(0%)';
-      }
+      <!-- ════ REGISTER FACE ════ -->
+      <div class="card-face card-back">
+        <div class="login-header"><span>Register</span></div>
 
-      // 1. SIGN UP LOGIC
-      async function handleSignUp() {
-          const email = document.getElementById('reg-email').value;
-          const password = document.getElementById('reg-password').value;
-          const firstName = document.getElementById('first-name').value;
-          const lastName = document.getElementById('last-name').value;
-          const contact_num = document.getElementById('reg-contact').value;
-          if (!email || !password) return alert("Please fill in email and password");
+        <div class="name-row">
+          <div class="input_box">
+            <input type="text" id="reg-fname" class="input-field" required autocomplete="given-name">
+            <label for="reg-fname" class="label">First Name</label>
+            <i class="bx bx-user icon"></i>
+          </div>
+          <div class="input_box">
+            <input type="text" id="reg-lname" class="input-field" required autocomplete="family-name">
+            <label for="reg-lname" class="label">Last Name</label>
+          </div>
+        </div>
 
-          const { data, error } = await _supabase.auth.signUp({
-              email: email,
-              password: password,
-              options: {
-                  data: { first_name: firstName, last_name: lastName ,contact:contact_num}
-              }
-          });
+        <div class="input_box">
+          <input type="email" id="reg-email" class="input-field" required autocomplete="email">
+          <label for="reg-email" class="label">Email Address</label>
+          <i class="bx bx-envelope icon"></i>
+          <div class="error-hint" id="email-hint"></div>
+        </div>
 
-          if (error) {
-              alert("Error: " + error.message);
-          } else {
-              alert("Success! Check your email for confirmation.");
-              slideToLogin();
-          }
-      }
+        <div class="input_box">
+          <input type="password" id="reg-pass" class="input-field" required autocomplete="new-password" oninput="checkStrength(this.value)">
+          <label for="reg-pass" class="label">Password</label>
+          <i class="bx bx-lock-alt icon" id="toggleRegPass" style="cursor:pointer;" title="Show/hide"></i>
+          <div class="strength-bar-wrap"><div class="strength-bar" id="strengthBar"></div></div>
+          <div class="strength-label" id="strengthLabel"></div>
+        </div>
 
-      // 2. LOGIN LOGIC
-      async function handleLogin() {
-          const email = document.getElementById('login-email').value;
-          const password = document.getElementById('login-password').value;
+        <div class="input_box">
+          <input type="password" id="reg-pass2" class="input-field" required autocomplete="new-password">
+          <label for="reg-pass2" class="label">Confirm Password</label>
+          <i class="bx bx-lock-check icon"></i>
+          <div class="error-hint" id="pass-hint"></div>
+        </div>
 
-          if (!email || !password) return alert("Please fill in all fields");
+        <div class="terms-row">
+          <input type="checkbox" id="terms">
+          <label for="terms">I agree to the <a href="#" style="color:var(--second-color);font-weight:500;">Terms &amp; Conditions</a> and <a href="#" style="color:var(--second-color);font-weight:500;">Privacy Policy</a>.</label>
+        </div>
 
-          const { data, error } = await _supabase.auth.signInWithPassword({
-              email: email,
-              password: password,
-          });
+        <div class="input_box">
+          <input type="submit" class="input-submit" value="Create Account" onclick="validateRegister(event)">
+        </div>
 
-          if (error) {
-              alert("Login failed: " + error.message);
-          } else {
-              window.location.href = 'home.html';
-          }
-      }
+        <div class="login-link">
+          <span>Already have an account? <a href="#" onclick="flip(false); return false;">Login</a></span>
+        </div>
+      </div>
 
-      // 3. FORGOT PASSWORD
-      async function handleForgotPassword() {
-          const email = document.getElementById('login-email').value;
-          if (!email) return alert("Enter your email in the login field first.");
+    </div><!-- card-inner -->
+  </div><!-- card-container -->
+</div><!-- wrapper -->
 
-          const { error } = await _supabase.auth.resetPasswordForEmail(email, {
-              redirectTo: window.location.origin + '/update.html', 
-          });
+<script>
+  /* ── Flip ── */
+  function flip(toRegister) {
+    document.getElementById('cardContainer').classList.toggle('flipped', toRegister);
+  }
 
-          if (error) alert("Error: " + error.message);
-          else alert("Password reset link sent to your email!");
-      }
-    </script>
+  /* ── Toggle password visibility ── */
+  function togglePass(inputId, iconEl) {
+    const inp = document.getElementById(inputId);
+    const show = inp.type === 'password';
+    inp.type = show ? 'text' : 'password';
+    iconEl.className = show ? 'bx bx-show icon' : 'bx bx-lock-alt icon';
+    iconEl.style.cursor = 'pointer';
+  }
+
+  document.getElementById('toggleLoginPass').addEventListener('click', function() {
+    togglePass('login-pass', this);
+  });
+  document.getElementById('toggleRegPass').addEventListener('click', function() {
+    togglePass('reg-pass', this);
+  });
+
+  /* ── Password strength ── */
+  function checkStrength(val) {
+    const bar = document.getElementById('strengthBar');
+    const label = document.getElementById('strengthLabel');
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+
+    const levels = [
+      { pct: '0%',   color: 'transparent', text: '' },
+      { pct: '25%',  color: '#ff4d4d',     text: 'Weak' },
+      { pct: '50%',  color: '#ffa500',     text: 'Fair' },
+      { pct: '75%',  color: '#f0d800',     text: 'Good' },
+      { pct: '100%', color: '#4caf50',     text: 'Strong 💪' },
+    ];
+    const l = levels[score];
+    bar.style.width = l.pct;
+    bar.style.background = l.color;
+    label.textContent = val.length ? l.text : '';
+  }
+
+  /* ── Register validation ── */
+  function validateRegister(e) {
+    e.preventDefault();
+    const email    = document.getElementById('reg-email');
+    const pass     = document.getElementById('reg-pass');
+    const pass2    = document.getElementById('reg-pass2');
+    const terms    = document.getElementById('terms');
+    const emailHint = document.getElementById('email-hint');
+    const passHint  = document.getElementById('pass-hint');
+    let valid = true;
+
+    // Email
+    const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRx.test(email.value)) {
+      emailHint.textContent = 'Please enter a valid email address.';
+      valid = false;
+    } else {
+      emailHint.textContent = '';
+    }
+
+    // Password match
+    if (pass.value !== pass2.value) {
+      passHint.textContent = 'Passwords do not match.';
+      valid = false;
+    } else if (pass.value.length < 8) {
+      passHint.textContent = 'Password must be at least 8 characters.';
+      valid = false;
+    } else {
+      passHint.textContent = '';
+    }
+
+    // Terms
+    if (!terms.checked) {
+      alert('Please accept the Terms & Conditions to continue.');
+      valid = false;
+    }
+
+    if (valid) {
+      alert('Account created successfully! 🎉');
+    }
+  }
+</script>
 </body>
 </html>
