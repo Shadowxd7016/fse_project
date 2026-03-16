@@ -3,99 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FixKar - User Dashboard</title>
+    <title>FixKar - Full Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background-color: #ffffff; font-family: sans-serif; }
+        body { background-color: #ffffff; font-family: sans-serif; scroll-behavior: smooth; }
         .card-shadow { box-shadow: 8px 8px 0px 0px rgba(0,0,0,1); border: 2px solid black; border-radius: 2rem; }
         .input-field { border: 1.5px solid black; border-radius: 0.75rem; padding: 0.5rem 1rem; width: 100%; outline: none; }
         .btn-black { background: black; color: white; border-radius: 9999px; padding: 0.6rem 2rem; font-weight: 600; transition: transform 0.1s; }
         .btn-black:active { transform: scale(0.95); }
+        .action-btn { transition: all 0.2s; cursor: pointer; }
+        .action-btn:hover { transform: scale(1.2); }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <header class="max-w-5xl mx-auto flex justify-between items-center mb-12">
+    <header class="max-w-5xl mx-auto flex justify-between items-center mb-12" style="border-color: black; border-width: 2px; border-radius: 2rem; padding: 0.5rem 2rem;">
         <div class="text-3xl font-bold italic text-red-600 flex items-center">
-            FIX<span class="text-blue-600">KAR</span>
-            <span class="ml-2 text-sm not-italic text-gray-400">⚙️</span>
-        </div>
+<img src="Picture1.png" alt="logo" class="w-40 h-25" style="padding: 0% 5%;margin-left: 1%;">        </div>
         <nav class="hidden md:flex space-x-8 font-medium">
             <a href="#" class="hover:text-blue-600">Home</a>
             <a href="#" class="hover:text-blue-600">About Us</a>
             <a href="#" class="hover:text-blue-600">Contact Us</a>
         </nav>
-        <button class="btn-black text-sm">Sign in</button>
+        <button id="auth-btn" class="btn-black text-sm" onclick="handleLogout()">Logout</button>
     </header>
 
     <main class="max-w-4xl mx-auto space-y-10">
 
         <section class="card-shadow p-8 bg-white">
-            <h2 class="text-xl font-bold mb-6 flex items-center">
-                <i class="far fa-user mr-3"></i> Update Profile
-            </h2>
-            <div class="flex flex-col md:flex-row gap-8">
-                <div class="flex flex-col items-center space-y-4">
-                    <div class="w-32 h-32 bg-gray-100 rounded-full border-2 border-black flex items-center justify-center">
-                        <i class="fas fa-user text-5xl text-gray-400"></i>
-                    </div>
-                    <button class="border border-black rounded-full px-4 py-1 text-xs font-bold uppercase">Select Photo</button>
-                </div>
-                <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-[10px] font-bold uppercase ml-1">First Name</label>
-                        <input type="text" placeholder="First Name" class="input-field text-sm">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold uppercase ml-1">Last Name</label>
-                        <input type="text" placeholder="Last Name" class="input-field text-sm">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="text-[10px] font-bold uppercase ml-1">Email Address</label>
-                        <input type="email" placeholder="Email" class="input-field text-sm">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="text-[10px] font-bold uppercase ml-1">New Password</label>
-                        <input type="password" placeholder="New Password" class="input-field text-sm">
-                    </div>
-                </div>
-            </div>
-            <div class="flex justify-end mt-6">
-                <button class="btn-black text-sm">Save Changes</button>
-            </div>
+          <h2 class="text-xl font-bold mb-6 flex items-center">
+              <i class="far fa-user mr-3"></i> Update Profile
+          </h2>
+          <div class="flex flex-col md:flex-row gap-8">
+              <div class="flex flex-col items-center space-y-4">
+                  <div class="w-32 h-32 bg-gray-100 rounded-full border-2 border-black flex items-center justify-center overflow-hidden">
+                      <img id="profile-img-display" src="" class="hidden w-full h-full object-cover">
+                      <i id="profile-icon-placeholder" class="fas fa-user text-5xl text-gray-400"></i>
+                  </div>
+                  <input type="file" id="avatar-file" accept="image/*" class="hidden" onchange="previewImage(this)">
+                  <button onclick="document.getElementById('avatar-file').click()" class="border border-black rounded-full px-4 py-1 text-xs font-bold uppercase hover:bg-black hover:text-white transition-colors">
+                      Select Photo
+                  </button>
+              </div>
+              
+              <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                      <label class="text-[10px] font-bold uppercase ml-1">First Name</label>
+                      <input type="text" id="profile-fname" placeholder="First Name" class="input-field text-sm">
+                  </div>
+                  <div>
+                      <label class="text-[10px] font-bold uppercase ml-1">Last Name</label>
+                      <input type="text" id="profile-lname" placeholder="Last Name" class="input-field text-sm">
+                  </div>
+                  <div class="md:col-span-2">
+                      <label class="text-[10px] font-bold uppercase ml-1">Email Address</label>
+                      <input type="email" id="profile-email" placeholder="Email" class="input-field text-sm bg-gray-50" disabled>
+                  </div>
+                  <div class="md:col-span-2">
+                      <label class="text-[10px] font-bold uppercase ml-1">New Password</label>
+                      <input type="password" id="profile-password" placeholder="Leave blank to keep current" class="input-field text-sm">
+                  </div>
+              </div>
+          </div>
+          <div class="flex justify-end mt-6">
+              <button id="save-profile-btn" onclick="updateFullProfile()" class="btn-black text-sm">
+                  Save Changes
+              </button>
+          </div>
         </section>
 
         <section class="card-shadow p-8 bg-white relative">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold flex items-center">
-                    <i class="fas fa-plus mr-3"></i> My Ads
+                    <i class="fas fa-list-ul mr-3"></i> My Ads
                 </h2>
                 <span class="bg-black text-white text-[10px] px-3 py-1 rounded-full font-bold">3 ADS</span>
             </div>
+            
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="border-2 border-black rounded-2xl p-4 relative overflow-hidden">
-                    <div class="absolute top-2 right-2 flex space-x-1">
-                        <div class="w-6 h-4 border border-black rounded-sm"></div>
-                        <div class="w-6 h-4 border border-black bg-red-500 rounded-sm"></div>
+                <div class="border-2 border-black rounded-2xl p-4 relative bg-white">
+                    <div class="absolute top-2 right-2 flex space-x-2 z-10">
+                        <i onclick="editAd('Wooden Chair', 1000, 'Furniture', 'New', 'High quality vintage oak chair.')" class="fas fa-pen-to-square text-blue-600 action-btn" title="Edit"></i>
+                        <i class="fas fa-circle-xmark text-red-500 action-btn" title="Delete"></i>
                     </div>
                     <div class="text-3xl mb-4">🪑</div>
                     <h3 class="font-bold text-sm">Wooden Chair</h3>
                     <p class="text-xs text-gray-600">Rs 1,000</p>
                 </div>
-                <div class="border-2 border-black rounded-2xl p-4 relative overflow-hidden">
-                    <div class="absolute top-2 right-2 flex space-x-1">
-                        <div class="w-6 h-4 border border-black rounded-sm"></div>
-                        <div class="w-6 h-4 border border-black bg-red-500 rounded-sm"></div>
+
+                <div class="border-2 border-black rounded-2xl p-4 relative bg-white">
+                    <div class="absolute top-2 right-2 flex space-x-2 z-10">
+                        <i onclick="editAd('Mobile Screen', 5000, 'Electronics', 'Used', 'iPhone 13 replacement screen.')" class="fas fa-pen-to-square text-blue-600 action-btn" title="Edit"></i>
+                        <i class="fas fa-circle-xmark text-red-500 action-btn" title="Delete"></i>
                     </div>
                     <div class="text-3xl mb-4">📱</div>
                     <h3 class="font-bold text-sm">Mobile Screen</h3>
                     <p class="text-xs text-gray-600">Rs 5,000</p>
                 </div>
-                <div class="border-2 border-black rounded-2xl p-4 relative overflow-hidden">
-                    <div class="absolute top-2 right-2 flex space-x-1">
-                        <div class="w-6 h-4 border border-black rounded-sm"></div>
-                        <div class="w-6 h-4 border border-black bg-red-500 rounded-sm"></div>
+
+                <div class="border-2 border-black rounded-2xl p-4 relative bg-white">
+                    <div class="absolute top-2 right-2 flex space-x-2 z-10">
+                        <i onclick="editAd('Fridge', 10000, 'Appliances', 'Refurbished', 'Energy efficient mini-fridge.')" class="fas fa-pen-to-square text-blue-600 action-btn" title="Edit"></i>
+                        <i class="fas fa-circle-xmark text-red-500 action-btn" title="Delete"></i>
                     </div>
                     <div class="text-3xl mb-4 text-blue-300">❄️</div>
                     <h3 class="font-bold text-sm">Fridge</h3>
@@ -104,57 +115,48 @@
             </div>
         </section>
 
-        <section class="card-shadow p-8 bg-white">
-            <h2 class="text-xl font-bold mb-6 flex items-center">
+        <section id="upload-section" class="card-shadow p-8 bg-white">
+            <h2 id="form-title" class="text-xl font-bold mb-6 flex items-center">
                 <i class="fas fa-upload mr-3"></i> Upload Ad
             </h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                 <div class="col-span-1">
                     <label class="text-[10px] font-bold uppercase ml-1">Title</label>
-                    <input type="text" placeholder="e.g. Wooden Chair" class="input-field text-sm">
+                    <input type="text" id="ad-title" placeholder="e.g. Wooden Chair" class="input-field text-sm">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold uppercase ml-1">Price (RS)</label>
-                    <input type="number" placeholder="1000" class="input-field text-sm">
+                    <input type="number" id="ad-price" placeholder="1000" class="input-field text-sm">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold uppercase ml-1">Category</label>
-                    <select class="input-field text-sm bg-white"><option>Select Category</option></select>
+                    <select id="ad-category" class="input-field text-sm bg-white">
+                        <option value="">Select Category</option>
+                        <option value="Furniture">Furniture</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Appliances">Appliances</option>
+                    </select>
                 </div>
                 <div>
                     <label class="text-[10px] font-bold uppercase ml-1">Condition</label>
-                    <select class="input-field text-sm bg-white"><option>Select Condition</option></select>
+                    <select id="ad-condition" class="input-field text-sm bg-white">
+                        <option value="">Select Condition</option>
+                        <option value="New">New</option>
+                        <option value="Used">Used</option>
+                        <option value="Refurbished">Refurbished</option>
+                    </select>
                 </div>
             </div>
             <div class="mb-6">
                 <label class="text-[10px] font-bold uppercase ml-1">Description</label>
-                <textarea rows="4" placeholder="Describe your item..." class="input-field text-sm"></textarea>
+                <textarea id="ad-desc" rows="4" placeholder="Describe your item..." class="input-field text-sm"></textarea>
             </div>
 
-            <div class="border border-gray-200 rounded-2xl p-6 bg-gray-50/50 mb-6">
-                <p class="text-[10px] font-bold uppercase mb-3 flex items-center">
-                    <i class="fas fa-map-marker-alt mr-2"></i> Location Details
-                </p>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
-                    <input type="text" placeholder="Province" class="input-field text-sm bg-white">
-                    <input type="text" placeholder="City" class="input-field text-sm bg-white">
-                    <input type="text" placeholder="Area" class="input-field text-sm bg-white">
-                    <button class="input-field text-sm bg-white font-bold flex items-center justify-center">
-                        <i class="fas fa-crosshairs mr-2"></i> Detect
-                    </button>
-                </div>
-            </div>
-
-            <div class="border-2 border-dashed border-black rounded-2xl p-10 flex flex-col items-center justify-center bg-white mb-6">
-                <div class="w-12 h-12 rounded-full border border-black flex items-center justify-center mb-2">
-                    <i class="fas fa-upload"></i>
-                </div>
-                <p class="text-[10px] font-bold uppercase">Click to upload photos</p>
-                <p class="text-[8px] text-gray-500 uppercase">PNG, JPG up to 10MB</p>
-            </div>
-
-            <div class="flex justify-end">
-                <button class="btn-black text-sm flex items-center">
+            <div class="flex justify-between items-center">
+                <button id="reset-btn" onclick="resetForm()" class="hidden text-xs font-bold uppercase underline text-gray-500 hover:text-black">
+                    Cancel Edit
+                </button>
+                <button id="submit-btn" class="btn-black text-sm flex items-center ml-auto">
                     Publish Ad <i class="fas fa-paper-plane ml-2 text-xs"></i>
                 </button>
             </div>
@@ -163,5 +165,163 @@
     </main>
 
     <footer class="h-20"></footer>
+
+    <script>
+       const _supabase = supabase.createClient('https://lvfbcbgmosfrpwvmrfhp.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2ZmJjYmdtb3NmcnB3dm1yZmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0Mjc3MTEsImV4cCI6MjA4OTAwMzcxMX0.CMvOjwLs_1sDunNpphV5niv668Y459TwfzxDLioXx8c');
+        // 1. Show image immediately after user selects a file
+        async function loadProfile() {
+          // 1. Get the logged-in user from Auth
+          const { data: { user }, error: userError } = await _supabase.auth.getUser();
+          
+          if (userError || !user) {
+              console.log("No active session found");
+              return; 
+          }
+
+          // 2. Fetch profile data from your 'profiles' table
+          let { data: profile, error } = await _supabase
+              .from('profiles')
+              .select('avatar_url, first_name, last_name, email')
+              .eq('id', user.id)
+              .single();
+
+          // 3. Fill the Email field (Priority: Profile Table -> Auth Email)
+          const emailField = document.getElementById('profile-email');
+          emailField.value = (profile && profile.email) ? profile.email : user.email;
+
+          // 4. Fill Names if profile exists
+          if (profile) {
+              document.getElementById('profile-fname').value = profile.first_name || '';
+              document.getElementById('profile-lname').value = profile.last_name || '';
+
+              // 5. Handle the Profile Picture
+              if (profile.avatar_url) {
+                  const imgDisplay = document.getElementById('profile-img-display');
+                  const iconPlaceholder = document.getElementById('profile-icon-placeholder');
+                  
+                  imgDisplay.src = profile.avatar_url;
+                  imgDisplay.classList.remove('hidden');
+                  iconPlaceholder.classList.add('hidden');
+              }
+          }
+      }
+      window.onload = loadProfile;
+      function previewImage(input) {
+          if (input.files && input.files[0]) {
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                  const img = document.getElementById('profile-img-display');
+                  img.src = e.target.result;
+                  img.classList.remove('hidden');
+                  document.getElementById('profile-icon-placeholder').classList.add('hidden');
+              }
+              reader.readAsDataURL(input.files[0]);
+          }
+      }
+
+      // 2. Main Update Function
+      async function updateFullProfile() {
+          const btn = document.getElementById('save-profile-btn');
+          btn.innerText = "Saving...";
+          btn.disabled = true;
+
+          try {
+              const { data: { user } } = await _supabase.auth.getUser();
+              if (!user) throw new Error("No user logged in");
+
+              let avatarUrl = document.getElementById('profile-img-display').src;
+
+              // A. Handle Image Upload if a new file was selected
+              const fileInput = document.getElementById('avatar-file');
+              if (fileInput.files.length > 0) {
+                  const file = fileInput.files[0];
+                  const fileExt = file.name.split('.').pop();
+                  const filePath = `${user.id}.${fileExt}`;
+
+                  // Upload to "avatars" bucket
+                  const { error: uploadError } = await _supabase.storage
+                      .from('avatars')
+                      .upload(filePath, file, { upsert: true });
+
+                  if (uploadError) throw uploadError;
+
+                  // Get Public URL
+                  const { data: urlData } = _supabase.storage.from('avatars').getPublicUrl(filePath);
+                  avatarUrl = urlData.publicUrl;
+              }
+
+              // B. Update Profiles Table
+              const updates = {
+                  id: user.id,
+                  first_name: document.getElementById('profile-fname').value,
+                  last_name: document.getElementById('profile-lname').value,
+                  avatar_url: avatarUrl,
+              };
+
+              const { error: dbError } = await _supabase.from('profiles').upsert(updates);
+              if (dbError) throw dbError;
+
+              // C. Handle Password Change (Optional)
+              const newPass = document.getElementById('profile-password').value;
+              if (newPass) {
+                  const { error: passError } = await _supabase.auth.updateUser({ password: newPass });
+                  if (passError) throw passError;
+              }
+
+              alert("Profile updated successfully!");
+          } catch (error) {
+              alert(error.message);
+          } finally {
+              btn.innerText = "Save Changes";
+              btn.disabled = false;
+          }
+      }
+        function editAd(title, price, category, condition, desc) {
+            // Fill Form
+            document.getElementById('ad-title').value = title;
+            document.getElementById('ad-price').value = price;
+            document.getElementById('ad-category').value = category;
+            document.getElementById('ad-condition').value = condition;
+            document.getElementById('ad-desc').value = desc;
+
+            // Change UI to Edit Mode
+            document.getElementById('form-title').innerHTML = '<i class="fas fa-edit mr-3"></i> Update Existing Ad';
+            document.getElementById('submit-btn').innerHTML = 'Update Ad <i class="fas fa-check ml-2 text-xs"></i>';
+            document.getElementById('submit-btn').classList.replace('bg-black', 'bg-blue-600');
+            document.getElementById('reset-btn').classList.remove('hidden');
+
+            // Scroll to form
+            document.getElementById('upload-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetForm() {
+            // Clear inputs
+            document.getElementById('ad-title').value = '';
+            document.getElementById('ad-price').value = '';
+            document.getElementById('ad-category').value = '';
+            document.getElementById('ad-condition').value = '';
+            document.getElementById('ad-desc').value = '';
+
+            // Reset UI to Upload Mode
+            document.getElementById('form-title').innerHTML = '<i class="fas fa-upload mr-3"></i> Upload Ad';
+            document.getElementById('submit-btn').innerHTML = 'Publish Ad <i class="fas fa-paper-plane ml-2 text-xs"></i>';
+            document.getElementById('submit-btn').classList.replace('bg-blue-600', 'bg-black');
+            document.getElementById('reset-btn').classList.add('hidden');
+        }
+        
+      async function checkUser() {
+        const { data: { user } } = await _supabase.auth.getUser();
+        if (!user) {
+          window.location.href = 'registration.html'; // Kick them out if not logged in
+        }
+      }
+      checkUser();
+      async function handleLogout() {
+        await _supabase.auth.signOut();
+        window.location.href = 'registration.html';
+      }
+      // Call this function as soon as the page loads
+      
+    </script>
 </body>
 </html>
