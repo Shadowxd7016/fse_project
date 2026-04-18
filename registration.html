@@ -102,7 +102,11 @@
                 </div>
                 <div>
                     <label class="text-[10px] font-bold uppercase">Email Address</label>
-                    <input type="email" placeholder="john@example.com" id="reg-email" class="input-field">
+                    <input type="email" placeholder="john@example.com" id="reg-email" required class="input-field">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase">Contact Number</label>
+                    <input type="text" placeholder="0300-1234567" id="reg-contact" class="input-field" required>
                 </div>
                 <div>
                     <label class="text-[10px] font-bold uppercase">Password</label>
@@ -206,14 +210,14 @@
           const password = document.getElementById('reg-password').value;
           const firstName = document.getElementById('first-name').value;
           const lastName = document.getElementById('last-name').value;
-
+          const contact_num = document.getElementById('reg-contact').value;
           if (!email || !password) return alert("Please fill in email and password");
 
           const { data, error } = await _supabase.auth.signUp({
               email: email,
               password: password,
               options: {
-                  data: { first_name: firstName, last_name: lastName }
+                  data: { first_name: firstName, last_name: lastName ,contact:contact_num}
               }
           });
 
