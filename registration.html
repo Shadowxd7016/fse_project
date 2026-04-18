@@ -221,12 +221,6 @@
               alert("Error: " + error.message);
           } else {
               alert("Success! Check your email for confirmation.");
-              // Only insert into profile if sign up was successful
-              if (data.user) {
-                  await _supabase.from('profiles').upsert([
-                      { id: data.user.id, first_name: firstName, last_name: lastName, email: email }
-                  ]);
-              }
               slideToLogin();
           }
       }

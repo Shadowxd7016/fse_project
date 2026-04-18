@@ -289,6 +289,7 @@
             <h2 id="form-title" class="text-xl font-bold mb-6 flex items-center">
                 <i class="fas fa-upload mr-3"></i> Upload Ad
             </h2>
+            
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                 <div class="col-span-2">
                     <label class="text-[10px] font-bold uppercase ml-1">Title</label>
@@ -309,6 +310,7 @@
                     </select>
                 </div>
             </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label class="text-[10px] font-bold uppercase ml-1">Category</label>
@@ -332,10 +334,12 @@
                     </label>
                 </div>
             </div>
+
             <div id="image-preview-container" class="flex flex-wrap gap-2 mb-4"></div>
+
             <div class="mb-6">
                 <label class="text-[10px] font-bold uppercase ml-1">Description</label>
-                <textarea id="ad-desc" rows="4" placeholder="Describe your item..." class="input-field text-sm"></textarea>
+                <textarea id="ad-desc" rows="4" placeholder="Describe your item (e.g., age, defects, reason for selling)..." class="input-field text-sm"></textarea>
             </div>
             <div class="flex justify-between items-center">
                 <button id="reset-btn" onclick="resetForm()" class="hidden text-xs font-bold uppercase underline text-gray-500 hover:text-black">Cancel Edit</button>
