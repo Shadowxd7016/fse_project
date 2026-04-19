@@ -1,29 +1,61 @@
-// 1. Declare data globally
-let allProductsData = []; 
-console.log("Script loaded, waiting for DOMContentLoaded...");
-// 2. This runs immediately to set up the "Watchman"
-const searchInput = document.getElementById('searchInput');
+const SUPABASE_URL  = 'https://lvfbcbgmosfrpwvmrfhp.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2ZmJjYmdtb3NmcnB3dm1yZmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0Mjc3MTEsImV4cCI6MjA4OTAwMzcxMX0.CMvOjwLs_1sDunNpphV5niv668Y459TwfzxDLioXx8c';
 
-searchInput.addEventListener('input', (e) => {
-    const searchTerm = e.target.value.toLowerCase().trim();
-    console.log("User is typing:", searchTerm); // Debugging line
-    
-    // Call the filter function
-    handleSearch(searchTerm);
-});
+const db = supabase.createClient(SUPABASE_URL,SUPABASE_ANON);
+// fetch data from supabase
+async function fetchProducts() {
+    const { data, error } = await db
+        .from('products')
+        .select('*');
 
-async function initApp() {
-    // 3. Fetch data from Supabase
-    const { data, error } = await db.from('products').select('*');
-    
     if (error) {
-        console.error("Supabase Error:", error);
+        console.error("Error fetching products:", error);
         return;
     }
 
-    allProductsData = data;
-    renderCategories(allProductsData); // Initial UI setup
-    console.log("Data loaded and ready for searching");
+    displayProducts(data);
+}
+
+function displayProducts(products) {
+    const electronicsDiv = document.getElementById("electronics");
+    const BooksDiv = document.getElementById("Books");
+    const services_Div = document.getElementById("Services");
+
+    electronicsDiv.innerHTML = "";
+    BooksDiv.innerHTML = "";
+    services_Div.innerHTML = "";
+
+    products.forEach(product => {
+        const div = document.createElement("div");
+
+        const image = product.image_urls?.[0] || "fallback.jpg";
+
+        div.innerHTML = `
+            <img src="${image}" alt="${product.title}">
+            <h3>${product.title}</h3>
+            <p>${product.description}</p>
+            <p>Price: ${product.price}</p>
+        `;
+
+        // 👉 CORE LOGIC (you must understand this)
+        if (product.category === "Electronics") {
+            electronicsDiv.appendChild(div);
+        } 
+        else if (product.category === "Books") {
+            BooksDiv.appendChild(div);
+        } 
+        else if (product.category == "Services")
+        {
+            services_Div.appendChild(div);
+        }
+        div.onclick = () => {
+            window.location.href = `product.html?id=${product.id}`;
+        };
+    });
+}
+
+function goToCategory(category) {
+    window.location.href = `category.html?category=${category}`;
 }
 
 
