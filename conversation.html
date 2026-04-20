@@ -171,6 +171,95 @@ window.onload = async function () {
         isBuyer = true;
 
         conversationId = await getOrCreateConversation(productId, sellerId);
+    let currentUser    = null;
+    let conversationId = null;
+    let sellerId       = null;
+    let isBuyer        = true;
+    let realtimeSub    = null;
+
+    // Track message IDs we rendered ourselves so realtime doesn't duplicate them
+    const renderedIds = new Set();
+
+    window.onload = async function() {
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get("id");
+
+        const { data: { user } } = await db.auth.getUser();
+        if (!user) { window.location.href = "registration.html"; return; }
+        currentUser = user;
+
+        async function fetchProduct() {
+            const { data, error } = await db
+                .from('products')
+                .select(`
+                    *,
+                    profiles (
+                        first_name,
+                        last_name,
+                        avatar_url
+                    )
+                `)
+                .eq('id', id)
+                .single();
+
+            if (error) {
+                console.error("Error fetching product and seller:", error);
+                return null;
+            }
+
+            displayProduct(data, data.profiles);
+            return data;
+        }
+
+        displayProduct = (product, seller) => {
+            document.getElementById('display-id').innerText = "#" + product.id;
+
+            const mainImg = document.getElementById('product-img');
+            const thumbGrid = document.getElementById('thumbnail-grid');
+            thumbGrid.innerHTML = '';
+
+            const images = product.image_urls || [];
+            if (images.length > 0) {
+                mainImg.src = images[0];
+                images.forEach((url) => {
+                    const thumb = document.createElement('img');
+                    thumb.src = url;
+                    thumb.className = "w-16 h-16 object-cover rounded border cursor-pointer hover:border-blue-500 transition";
+                    thumb.onclick = () => { mainImg.src = url; };
+                    thumbGrid.appendChild(thumb);
+                });
+            } else {
+                mainImg.src = "https://picsum.photos/400/300";
+            }
+
+            if (seller) {
+                document.getElementById('seller-img').src = seller.avatar_url || "https://picsum.photos/60";
+                const fullName = `${seller.first_name || ''} ${seller.last_name || ''}`.trim();
+                document.getElementById('seller-name').innerText = fullName || "Unknown Seller";
+            }
+        }
+
+        if (!id) {
+            document.getElementById('display-id').innerText = "No ID provided";
+            return;
+        }
+
+        const product = await fetchProduct();
+        if (!product) return;
+
+        sellerId = product.user_id;
+        isBuyer  = (currentUser.id !== sellerId);
+
+        // ── FIX 2: Block seller from messaging their own listing ──────────────
+        if (!isBuyer) {
+            document.getElementById('chat-messages').innerHTML =
+                `<p class="text-center text-gray-400 text-sm mt-8">You are viewing your own listing.</p>`;
+            document.getElementById('input-bar').classList.add('hidden');
+            document.getElementById('own-listing-banner').classList.remove('hidden');
+            return; // stop here — no conversation needed
+        }
+
+        conversationId = await getOrCreateConversation(id, sellerId);
         if (!conversationId) return;
 
         await loadMessages();
@@ -415,6 +504,163 @@ function handleLogout() {
         window.location.href = "login.html";
     });
 }
+
+        document.getElementById('msg-input').disabled = false;
+        document.getElementById('send-btn').disabled  = false;
+        document.getElementById('msg-input').focus();
+    };
+
+    async function getOrCreateConversation(productId, sellerUid) {
+        const buyerId      = currentUser.id; // always the buyer here (seller blocked above)
+        const realSellerId = sellerUid;
+
+        const { data: existing, error: fetchErr } = await db
+            .from('conversations')
+            .select('id')
+            .eq('product_id', productId)
+            .eq('buyer_id',   buyerId)
+            .eq('seller_id',  realSellerId)
+            .maybeSingle();
+
+        if (fetchErr) { console.error("Conversation fetch error:", fetchErr); return null; }
+        if (existing)   return existing.id;
+
+        const { data: created, error: createErr } = await db
+            .from('conversations')
+            .insert({ product_id: productId, buyer_id: buyerId, seller_id: realSellerId })
+            .select('id')
+            .single();
+
+        if (createErr) { console.error("Conversation create error:", createErr); return null; }
+        return created.id;
+    }
+
+    async function loadMessages() {
+        const { data: messages, error } = await db
+            .from('messages')
+            .select('*')
+            .eq('conversation_id', conversationId)
+            .order('created_at', { ascending: true });
+
+        if (error) { console.error("Messages fetch error:", error); return; }
+
+        const container = document.getElementById('chat-messages');
+        container.innerHTML = '';
+
+        if (messages.length === 0) {
+            container.innerHTML = `<p class="text-center text-gray-400 text-sm mt-8">No messages yet. Say hello! 👋</p>`;
+            return;
+        }
+
+        messages.forEach(msg => {
+            renderedIds.add(msg.id); // mark all loaded messages as already rendered
+            appendMessage(msg, false);
+        });
+        scrollToBottom();
+    }
+
+    function subscribeToMessages() {
+        realtimeSub = db
+            .channel(`messages:conv:${conversationId}`)
+            .on(
+                'postgres_changes',
+                {
+                    event:  'INSERT',
+                    schema: 'public',
+                    table:  'messages',
+                    filter: `conversation_id=eq.${conversationId}`,
+                },
+                (payload) => {
+                    const msg = payload.new;
+
+                    // ── FIX 1: Skip if we already rendered this message ───────
+                    if (renderedIds.has(msg.id)) return;
+                    renderedIds.add(msg.id);
+
+                    appendMessage(msg, true);
+                    scrollToBottom();
+                }
+            )
+            .subscribe();
+    }
+
+    function appendMessage(msg, animate) {
+        const container = document.getElementById('chat-messages');
+
+        const placeholder = container.querySelector('p.text-center');
+        if (placeholder) placeholder.remove();
+
+        const sentByMe = isBuyer ? msg.is_buyer : !msg.is_buyer;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = `flex items-end ${sentByMe ? 'justify-end' : 'justify-start'} ${animate ? 'msg-enter' : ''}`;
+
+        const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        wrapper.innerHTML = `
+            <div class="max-w-sm lg:max-w-md">
+                <div class="${sentByMe
+                    ? 'bg-blue-600 text-white rounded-t-2xl rounded-bl-2xl'
+                    : 'bg-white text-gray-800 rounded-t-2xl rounded-br-2xl shadow-sm'
+                } px-4 py-3">
+                    <p class="text-sm leading-relaxed">${escapeHtml(msg.content)}</p>
+                </div>
+                <p class="text-xs text-gray-400 mt-1 ${sentByMe ? 'text-right' : 'text-left'} px-1">${time}</p>
+            </div>
+        `;
+
+        container.appendChild(wrapper);
+    }
+
+    async function sendMessage() {
+        const input   = document.getElementById('msg-input');
+        const content = input.value.trim();
+        if (!content || !conversationId) return;
+
+        input.value = '';
+        document.getElementById('send-btn').disabled = true;
+
+        const { data, error } = await db.from('messages').insert({
+            conversation_id: conversationId,
+            content:         content,
+            is_buyer:        isBuyer,
+        }).select('id').single(); // get back the id so we can pre-mark it
+
+        document.getElementById('send-btn').disabled = false;
+        input.focus();
+
+        if (error) {
+            console.error("Send error:", error);
+            alert("Failed to send message. Please try again.");
+            input.value = content;
+            return;
+        }
+
+        // Pre-mark this id so the realtime callback skips it (prevents duplicate)
+        if (data?.id) renderedIds.add(data.id);
+
+        // Render immediately ourselves instead of waiting for realtime
+        appendMessage({ ...data, content, is_buyer: isBuyer, created_at: new Date().toISOString() }, true);
+        scrollToBottom();
+    }
+
+    function scrollToBottom() {
+        const c = document.getElementById('chat-messages');
+        c.scrollTop = c.scrollHeight;
+    }
+
+    function escapeHtml(str) {
+        return str
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+    }
+
+    function handleLogout() {
+        if (realtimeSub) db.removeChannel(realtimeSub);
+        db.auth.signOut().then(() => { window.location.href = "login.html"; });
+    }
 </script>
 </body>
 </html>
