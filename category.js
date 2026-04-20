@@ -1,9 +1,3 @@
-const SUPABASE_URL  = 'https://lvfbcbgmosfrpwvmrfhp.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2ZmJjYmdtb3NmcnB3dm1yZmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0Mjc3MTEsImV4cCI6MjA4OTAwMzcxMX0.CMvOjwLs_1sDunNpphV5niv668Y459TwfzxDLioXx8c';
-
-
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-
 // 👉 Get category from URL
 const params = new URLSearchParams(window.location.search);
 const category = params.get("category");

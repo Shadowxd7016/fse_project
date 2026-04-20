@@ -17,6 +17,9 @@ async function checkUser() {
         }
 
          // placeholder avatar
+        // 👉 User logged in → replace button with profile icon
+        const img = document.createElement("img");
+        img.src = "https://shorturl.at/Cxhyg"; // placeholder avatar
         img.className = "profile-icon";
 
         img.onclick = () => {
