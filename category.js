@@ -82,7 +82,17 @@ function resetFilters() {
 
     fetchProducts();
     
-    fetchProducts({search});
+}
+
+/* ── RESET FILTERS ── */
+function resetFilters() {
+    document.getElementById("minPrice").value       = "";
+    document.getElementById("maxPrice").value       = "";
+
+    document.querySelectorAll(".condition-list input[type='checkbox']")
+        .forEach(cb => cb.checked = false);
+
+    fetchProducts();
 }
 
 /* ── LIVE SEARCH (fires as user types) ── */
@@ -92,6 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (searchInput) {
         searchInput.addEventListener("input", () => applyFilters());
     }
+    
 });
 
 

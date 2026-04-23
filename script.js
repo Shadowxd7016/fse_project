@@ -7,6 +7,7 @@ async function fetchProducts(filters = {}) {
     if (filters.search && filters.search.trim() !== "") {
         query = query.ilike('title', `%${filters.search.trim()}%`);
     }
+    
 
     const { data, error } = await query;
 
@@ -70,6 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (searchInput) {
         searchInput.addEventListener("input", () => applyFilters());
     }
+    
 });
 
 function goToCategory(category) {
