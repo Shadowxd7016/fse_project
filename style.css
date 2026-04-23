@@ -370,6 +370,10 @@ body {
 .filter-group input[type="text"],
 .filter-group input[type="number"],
 .filter-group select 
+
+/* Inputs */
+
+.filter-group input[type="text"]
 {
     width: 90%;
     padding: 9px 12px;

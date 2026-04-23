@@ -81,6 +81,8 @@ function resetFilters() {
         .forEach(cb => cb.checked = false);
 
     fetchProducts();
+    
+    fetchProducts({search});
 }
 
 /* ── LIVE SEARCH (fires as user types) ── */
@@ -90,7 +92,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (searchInput) {
         searchInput.addEventListener("input", () => applyFilters());
     }
-    
 });
 
 

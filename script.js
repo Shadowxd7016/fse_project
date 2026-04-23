@@ -1,9 +1,14 @@
 
 // fetch data from supabase
-async function fetchProducts() {
-    const { data, error } = await db
-        .from('products')
-        .select('*');
+async function fetchProducts(filters = {}) {
+     let query = db.from('products').select('*');
+
+    // 🔍 Keyword search on title
+    if (filters.search && filters.search.trim() !== "") {
+        query = query.ilike('title', `%${filters.search.trim()}%`);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
         console.error("Error fetching products:", error);
@@ -50,6 +55,22 @@ function displayProducts(products) {
         };
     });
 }
+
+/* ── COLLECT & APPLY FILTERS ── */
+function applyFilters() {
+
+    const search   = document.getElementById("searchInput")?.value || "";
+    
+    fetchProducts({search});
+}
+
+/* ── LIVE SEARCH (fires as user types) ── */
+document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput) {
+        searchInput.addEventListener("input", () => applyFilters());
+    }
+});
 
 function goToCategory(category) {
     window.location.href = `category.html?category=${category}`;
