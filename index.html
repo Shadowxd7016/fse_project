@@ -928,7 +928,7 @@
                 if (applySection) applySection.style.display = 'block';
             }
         }
-
+            
         async function checkUser() {
             const { data: { user } } = await _supabase.auth.getUser();
             if (!user) window.location.href = 'registration.html';

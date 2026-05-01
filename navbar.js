@@ -16,15 +16,7 @@ async function checkUser() {
             img.src = "https://shorturl.at/Cxhyg";
         }
 
-         // placeholder avatar
-        // 👉 User logged in → replace button with profile icon
-        const img = document.createElement("img");
-        if (profile.avatar_url) {
-                    img.src = profile.avatar_url;
-        } else {
-                    img.src = "https://shorturl.at/Cxhyg";
-        }
-
+         
          // placeholder avatar
         img.className = "profile-icon";
 
