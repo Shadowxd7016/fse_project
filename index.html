@@ -170,75 +170,40 @@
 </head>
 <body class="p-4 md:p-8">
 
-    <header class="mx-auto flex justify-between items-center mb-12" style="border-color: black; border-width: 0.8px; border-radius: 0.1rem; padding: 0.5rem 2rem;">
-        <div class="text-3xl font-bold italic text-red-600 flex items-center">
-            <img src="Picture1.png" alt="logo" class="w-40 h-25" style="padding: 0% 5%; margin-left: 1%;">
-        </div>
-        <nav class="hidden md:flex space-x-8 font-medium">
-            <a href="home.html" class="hover:text-blue-600">Home</a>
-            <a href="#" class="hover:text-blue-600">About Us</a>
-            <a href="#" class="hover:text-blue-600">Contact Us</a>
+    <header class="mx-auto flex justify-between items-center mb-12" style="border-color: black; border-width: 0.8px; border-radius: 0.1rem; padding: 0.5rem 2rem; min-height: 80px;">
+    <div class="flex items-center">
+        <img src="Picture1.png" alt="logo" class="w-40 h-auto object-contain">
+    </div>
+
+    <div class="flex items-center space-x-8">
+        <nav class="hidden md:flex items-center space-x-6 font-medium">
+            <a href="home.html" class="hover:text-blue-600 transition">Home</a>
+            <a href="About us.html" class="hover:text-blue-600 transition">About Us</a>
+            <a href="Contact us.html" class="hover:text-blue-600 transition">Contact Us</a>
+            
+            <div id="notif-wrapper" class="relative flex items-center">
+                <button id="notif-btn" onclick="toggleNotifPanel()" title="Conversations" class="focus:outline-none flex items-center">
+                    <i class="fas fa-bell text-sm"></i>
+                    <span id="notif-badge" class="ml-1 bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded-full">0</span>
+                </button>
+                
+                <div id="notif-panel" class="absolute right-0 mt-2 top-full">
+                    <div class="notif-header">
+                        <span>💬 Conversations</span>
+                        <span id="notif-count-label" class="text-xs text-gray-400 font-normal"></span>
+                    </div>
+                    <div id="notif-list" class="notif-list">
+                        <div class="notif-empty"><i class="fas fa-comment-slash"></i> Loading...</div>
+                    </div>
+                </div>
+            </div>
         </nav>
-        <button id="auth-btn" class="btn-black text-sm" onclick="handleLogout()">Logout</button>
-    </header>
 
-        <div class="flex items-center space-x-8">
-            <nav class="hidden md:flex space-x-8 font-medium">
-                <a href="home.html" class="hover:text-blue-600">Home</a>
-                <a href="About Us.html" class="hover:text-blue-600">About Us</a>
-                <a href="Contact Us.html" class="hover:text-blue-600">Contact Us</a>
-            </nav>
-
-        <div class="flex items-center space-x-8">
-            <nav class="hidden md:flex space-x-8 font-medium">
-                <a href="home.html" class="hover:text-blue-600">Home</a>
-                <a href="About Us.html" class="hover:text-blue-600">About Us</a>
-                <a href="Contact Us.html" class="hover:text-blue-600">Contact Us</a>
-            </nav>
-
-            <!-- ── Notification Bell ── -->
-            <div id="notif-wrapper">
-                <button id="notif-btn" onclick="toggleNotifPanel()" title="Conversations">
-                    <i class="fas fa-bell text-sm"></i>
-                    <span id="notif-badge">0</span>
-                </button>
-                <div id="notif-panel">
-                    <div class="notif-header">
-                        <span>💬 Conversations</span>
-                        <span id="notif-count-label" class="text-xs text-gray-400 font-normal"></span>
-                    </div>
-                    <div id="notif-list" class="notif-list">
-                        <div class="notif-empty"><i class="fas fa-comment-slash"></i>Loading...</div>
-                    </div>
-                </div>
-            </div>
-
-            <button id="auth-btn" class="btn-black text-sm" onclick="handleLogout()">Logout</button>
-        </div>
-    </header>
-
-    <main class="mx-auto space-y-10">
-
-            <!-- ── Notification Bell ── -->
-            <div id="notif-wrapper">
-                <button id="notif-btn" onclick="toggleNotifPanel()" title="Conversations">
-                    <i class="fas fa-bell text-sm"></i>
-                    <span id="notif-badge">0</span>
-                </button>
-                <div id="notif-panel">
-                    <div class="notif-header">
-                        <span>💬 Conversations</span>
-                        <span id="notif-count-label" class="text-xs text-gray-400 font-normal"></span>
-                    </div>
-                    <div id="notif-list" class="notif-list">
-                        <div class="notif-empty"><i class="fas fa-comment-slash"></i>Loading...</div>
-                    </div>
-                </div>
-            </div>
-
-            <button id="auth-btn" class="btn-black text-sm" onclick="handleLogout()">Logout</button>
-        </div>
-    </header>
+        <button id="auth-btn" class="bg-black text-white px-6 py-2 rounded-xl font-bold hover:bg-gray-800 transition text-sm" onclick="handleLogout()">
+            Logout
+        </button>
+    </div>
+</header>
 
     <main class="mx-auto space-y-10">
         <section id="apply-tech" style="display: none;" class="card-shadow p-8 bg-white">
