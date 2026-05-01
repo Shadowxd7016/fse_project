@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FixKar - Full Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background-color: #ffffff; font-family: sans-serif; scroll-behavior: smooth; }
+        .card-shadow { box-shadow: 8px 8px 0px 0px rgba(0,0,0,1); border: 2px solid black; border-radius: 2rem; }
+        .input-field { border: 1.5px solid black; border-radius: 0.75rem; padding: 0.5rem 1rem; width: 100%; outline: none; }
+        .btn-black { background: black; color: white; border-radius: 9999px; padding: 0.6rem 2rem; font-weight: 600; transition: transform 0.1s; }
+        .btn-black:active { transform: scale(0.95); }
+        .action-btn { transition: all 0.2s; cursor: pointer; }
+        .action-btn:hover { transform: scale(1.2); }
+
+        /* ── Notification Bell ─────────────────────────────────────── */
+        #notif-wrapper { position: relative; }
+
+        #notif-btn {
+            position: relative;
+            width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            border: 1.5px solid black;
+            background: white;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        #notif-btn:hover { background: #f3f4f6; }
+
+        #notif-badge {
+            position: absolute;
+            top: -4px; right: -4px;
+            background: #ef4444;
+            color: white;
+            font-size: 9px;
+            font-weight: 700;
+            min-width: 16px; height: 16px;
+            border-radius: 999px;
+            display: none;
+            align-items: center; justify-content: center;
+            padding: 0 3px;
+            border: 2px solid white;
+        }
+
+        #notif-panel {
+            display: none;
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 320px;
+            background: white;
+            border: 2px solid black;
+            border-radius: 1.25rem;
+            box-shadow: 6px 6px 0px 0px rgba(0,0,0,1);
+            z-index: 999;
+            overflow: hidden;
+            animation: popIn 0.18s cubic-bezier(.34,1.56,.64,1);
+        }
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.92) translateY(-6px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        #notif-panel.open { display: block; }
+
+        .notif-header {
+            padding: 12px 16px 10px;
+            border-bottom: 1.5px solid black;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .notif-header span { font-weight: 700; font-size: 13px; }
+
+        .notif-list { max-height: 340px; overflow-y: auto; }
+        .notif-list::-webkit-scrollbar { width: 4px; }
+        .notif-list::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+
+        .notif-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 14px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.12s;
+            text-decoration: none;
+            color: inherit;
+        }
+        .notif-item:last-child { border-bottom: none; }
+        .notif-item:hover { background: #f9fafb; }
+
+        .notif-avatar {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            border: 1.5px solid black;
+            flex-shrink: 0;
+            background: #e5e7eb;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px; color: #6b7280;
+            overflow: hidden;
+        }
+        .notif-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+        .notif-body { flex: 1; min-width: 0; }
+        .notif-name     { font-weight: 700; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .notif-product  { font-size: 11px; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .notif-last-msg { font-size: 11px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+
+        .notif-tag {
+            font-size: 9px; font-weight: 800; text-transform: uppercase;
+            padding: 2px 7px; border-radius: 999px; flex-shrink: 0;
+            letter-spacing: 0.04em;
+        }
+        .tag-buyer  { background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
+        .tag-seller { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+
+        .notif-empty {
+            padding: 32px 16px;
+            text-align: center;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        .notif-empty i { font-size: 28px; display: block; margin-bottom: 8px; color: #d1d5db; }
+        .technician-mini-bar {
+            background: #f9f9f9;
+            padding: 30px 20px;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            margin: 20px auto;
+            max-width: 900px;
+        }
+
+        .mini-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .mini-text h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.25rem;
+            color: #111;
+        }
+
+        .mini-text p {
+            margin: 0;
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .mini-btn {
+            background: #000; /* Classic white-label black */
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 600px) {
+            .mini-container { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <header class="mx-auto flex justify-between items-center mb-12" style="border-color: black; border-width: 0.8px; border-radius: 0.1rem; padding: 0.5rem 2rem;">
+        <div class="text-3xl font-bold italic text-red-600 flex items-center">
+            <img src="Picture1.png" alt="logo" class="w-40 h-25" style="padding: 0% 5%; margin-left: 1%;">
+        </div>
+
+        <div class="flex items-center space-x-8">
+            <nav class="hidden md:flex space-x-8 font-medium">
+                <a href="home.html" class="hover:text-blue-600">Home</a>
+                <a href="About Us.html" class="hover:text-blue-600">About Us</a>
+                <a href="Contact Us.html" class="hover:text-blue-600">Contact Us</a>
+            </nav>
+
+            <!-- ── Notification Bell ── -->
+            <div id="notif-wrapper">
+                <button id="notif-btn" onclick="toggleNotifPanel()" title="Conversations">
+                    <i class="fas fa-bell text-sm"></i>
+                    <span id="notif-badge">0</span>
+                </button>
+                <div id="notif-panel">
+                    <div class="notif-header">
+                        <span>💬 Conversations</span>
+                        <span id="notif-count-label" class="text-xs text-gray-400 font-normal"></span>
+                    </div>
+                    <div id="notif-list" class="notif-list">
+                        <div class="notif-empty"><i class="fas fa-comment-slash"></i>Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="auth-btn" class="btn-black text-sm" onclick="handleLogout()">Logout</button>
+        </div>
+    </header>
+
+    <main class="mx-auto space-y-10">
+        <section id="apply-tech" style="display: none;" class="card-shadow p-8 bg-white">
+            <div class="mini-container">
+                <div class="mini-text">
+                    <h3>Ready to lead? <strong>Become a Technician.</strong></h3>
+                    <p>Set your own schedule and earn more with our professional network.</p>
+                </div>
+                <a href="apply.html" class="mini-btn">Get Started</a>
+            </div>
+        </section>
+
+        <section id="tech-promo" style="display: none;" class="card-shadow p-8 bg-white">
+            <div class="mini-container">
+                <div class="mini-text">
+                    <h3 class="italic">Ready to join the crew? <strong>Access your Portal.</strong></h3>
+                    <p>Elevate your status and manage your professional technician dashboard.</p>
+                </div>
+                <a href="tech_dashboard.html" class="mt-6 md:mt-0 bg-black text-white px-8 py-3 rounded-xl font-bold text-center hover:bg-red-600 transition transform hover:scale-105 shadow-[4px_4px_0px_0px_rgba(220,38,38,1)]">
+                    Go to Dashboard
+                </a>
+            </div>
+        </section>
+        <section class="card-shadow p-8 bg-white">
+          <h2 class="text-xl font-bold mb-6 flex items-center">
+              <i class="far fa-user mr-3"></i> Update Profile
+          </h2>
+          <div class="flex flex-col md:flex-row gap-8">
+              <div class="flex flex-col items-center space-y-4">
+                  <div class="w-32 h-32 bg-gray-100 rounded-full border-2 border-black flex items-center justify-center overflow-hidden">
+                      <img id="profile-img-display" src="" class="hidden w-full h-full object-cover">
+                      <i id="profile-icon-placeholder" class="fas fa-user text-5xl text-gray-400"></i>
+                  </div>
+                  <input type="file" id="avatar-file" accept="image/*" class="hidden" onchange="previewImage(this)">
+                  <button onclick="document.getElementById('avatar-file').click()" class="border border-black rounded-full px-4 py-1 text-xs font-bold uppercase hover:bg-black hover:text-white transition-colors">
+                      Select Photo
+                  </button>
+              </div>
+              <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                      <label class="text-[10px] font-bold uppercase ml-1">First Name</label>
+                      <input type="text" id="profile-fname" placeholder="First Name" class="input-field text-sm">
+                  </div>
+                  <div>
+                      <label class="text-[10px] font-bold uppercase ml-1">Last Name</label>
+                      <input type="text" id="profile-lname" placeholder="Last Name" class="input-field text-sm">
+                  </div>
+                  <div>
+                      <label class="text-[10px] font-bold uppercase ml-1">Email Address</label>
+                      <input type="email" id="profile-email" placeholder="Email" class="input-field text-sm bg-gray-50" disabled>
+                  </div>
+                  <div>
+                      <label class="text-[10px] font-bold uppercase ml-1">Phone number</label>
+                      <input type="text" id="profile-contact" placeholder="Number" class="input-field text-sm bg-gray-50">
+                  </div>
+                  <div class="md:col-span-2">
+                      <label class="text-[10px] font-bold uppercase ml-1">New Password</label>
+                      <input type="password" id="profile-password" placeholder="Leave blank to keep current" class="input-field text-sm">
+                  </div>
+              </div>
+          </div>
+          <div class="flex justify-end mt-6">
+              <button id="save-profile-btn" onclick="updateFullProfile()" class="btn-black text-sm">Save Changes</button>
+          </div>
+        </section>
+
+        <section class="card-shadow p-8 bg-white relative">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold flex items-center"><i class="fas fa-list-ul mr-3"></i> My Ads</h2>
+                <span id="ad-count" class="bg-black text-white text-[10px] px-3 py-1 rounded-full font-bold">0 ADS</span>
+            </div>
+            <div id="my-ads-container" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <p class="text-gray-400 text-sm italic col-span-full">Loading your ads...</p>
+            </div>
+        </section>
+
+        <section id="upload-section" class="card-shadow p-8 bg-white">
+            <h2 id="form-title" class="text-xl font-bold mb-6 flex items-center">
+                <i class="fas fa-upload mr-3"></i> Upload Ad
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <div class="col-span-2">
+                    <label class="text-[10px] font-bold uppercase ml-1">Title</label>
+                    <input type="text" id="ad-title" placeholder="e.g. Wooden Chair" class="input-field text-sm">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase ml-1">Price (RS)</label>
+                    <input type="number" id="ad-price" placeholder="1000" class="input-field text-sm">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase ml-1">Condition</label>
+                    <select id="ad-condition" class="input-field text-sm bg-white">
+                        <option value="">Select Condition</option>
+                        <option value="Damaged">Damaged (For Parts)</option>
+                        <option value="Used">Used</option>
+                        <option value="Refurbished">Refurbished</option>
+                        <option value="Like New">Like New</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="text-[10px] font-bold uppercase ml-1">Category</label>
+                    <select id="ad-category" class="input-field text-sm bg-white">
+                        <option value="">Select Category</option>
+                        <option value="Furniture">Furniture</option>
+                        <option value="Electronics">Electronics & Mobiles</option>
+                        <option value="Appliances">Home Appliances</option>
+                        <option value="Vehicles">Vehicles</option>
+                        <option value="Fashion">Fashion & Beauty</option>
+                        <option value="Books">Books & Hobbies</option>
+                        <option value="Services">Services</option>
+                        <option value="Eco-Friendly">Eco-Friendly Products</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase ml-1">Upload Pictures</label>
+                    <label for="ad-images" class="input-field text-sm bg-gray-50 flex items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors border-dashed">
+                        <i class="fas fa-camera mr-2"></i> Choose Images
+                        <input type="file" id="ad-images" multiple accept="image/*" class="hidden" onchange="previewImages()">
+                    </label>
+                </div>
+            </div>
+            <div id="image-preview-container" class="flex flex-wrap gap-2 mb-4"></div>
+            <div class="mb-6">
+                <label class="text-[10px] font-bold uppercase ml-1">Description</label>
+                <textarea id="ad-desc" rows="4" placeholder="Describe your item..." class="input-field text-sm"></textarea>
+            </div>
+            <div class="flex justify-between items-center">
+                <button id="reset-btn" onclick="resetForm()" class="hidden text-xs font-bold uppercase underline text-gray-500 hover:text-black">Cancel Edit</button>
+                <button id="submit-btn" onclick="handlePublishAd()" class="btn-black text-sm flex items-center ml-auto">
+                    Publish Ad <i class="fas fa-paper-plane ml-2 text-xs"></i>
+                </button>
+            </div>
+        </section>
+
+        <div id="boostModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+            <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
+                <div class="bg-blue-600 p-6 text-white">
+                    <h3 class="text-xl font-bold">Boost Your Listing (RS.200/ad)</h3>
+                    <p class="text-blue-100 text-sm">Enter payment details to go featured</p>
+                </div>
+                <div class="p-6 space-y-4">
+                    <input type="hidden" id="targetAdId">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Card Number</label>
+                        <div class="relative">
+                            <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19"
+                                class="w-full border-b-2 border-gray-200 focus:border-blue-500 outline-none py-2 tracking-widest">
+                            <i class="fas fa-credit-card absolute right-2 top-3 text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div class="flex gap-6">
+                        <div class="flex-1">
+                            <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Expiry (MM/YY)</label>
+                            <input type="text" id="expiry" placeholder="12/26" maxlength="5"
+                                class="w-full border-b-2 border-gray-200 focus:border-blue-500 outline-none py-2">
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">CVV</label>
+                            <input type="password" id="cvv" placeholder="***" maxlength="3"
+                                class="w-full border-b-2 border-gray-200 focus:border-blue-500 outline-none py-2">
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6 bg-gray-50 flex gap-3">
+                    <button onclick="closeBoostModal()" class="flex-1 px-4 py-2 text-gray-600 font-medium hover:text-gray-800 transition">Cancel</button>
+                    <button onclick="validateAndSubmit()" class="flex-1 px-4 py-2 bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:bg-blue-700 transition">Pay Now</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer id="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h2 class="footer-logo">FixKar</h2>
+                <p>Buy & Sell easily</p>
+                <div class="socials">
+                    <a href="#">Facebook</a>
+                    <a href="#">Instagram</a>
+                    <a href="#">Twitter</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Categories</h3>
+                <a href="#">Electronics</a>
+                <a href="#">Clothing</a>
+                <a href="#">Others</a>
+            </div>
+            <div class="footer-section">
+                <h3>Company</h3>
+                <a href="#">About Us</a>
+                <a href="#">Contact Us</a>
+            </div>
+        </div>
+        <p class="footer-bottom">© 2026 MyMarket. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const _supabase = supabase.createClient(
+            'https://lvfbcbgmosfrpwvmrfhp.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2ZmJjYmdtb3NmcnB3dm1yZmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0Mjc3MTEsImV4cCI6MjA4OTAwMzcxMX0.CMvOjwLs_1sDunNpphV5niv668Y459TwfzxDLioXx8c'
+        );
+
+        // ════════════════════════════════════════════════════════════
+        //  NOTIFICATION BELL
+        // ════════════════════════════════════════════════════════════
+        let notifPanelOpen = false;
+        let notifLoaded    = false;
+
+        function toggleNotifPanel() {
+            notifPanelOpen = !notifPanelOpen;
+            document.getElementById('notif-panel').classList.toggle('open', notifPanelOpen);
+            if (notifPanelOpen && !notifLoaded) {
+                loadConversations();
+                notifLoaded = true;
+            }
+        }
+
+        document.addEventListener('click', function(e) {
+            if (notifPanelOpen && !document.getElementById('notif-wrapper').contains(e.target)) {
+                notifPanelOpen = false;
+                document.getElementById('notif-panel').classList.remove('open');
+            }
+        });
+
+        async function loadConversations() {
+            const list  = document.getElementById('notif-list');
+            const badge = document.getElementById('notif-badge');
+            const label = document.getElementById('notif-count-label');
+
+            list.innerHTML = `<div class="notif-empty"><i class="fas fa-spinner fa-spin"></i>Loading...</div>`;
+
+            const { data: { user } } = await _supabase.auth.getUser();
+            if (!user) return;
+
+            // Step 1: Fetch conversations (no profile joins — avoids FK naming issue)
+            const { data: convs, error } = await _supabase
+                .from('conversations')
+                .select('id, product_id, buyer_id, seller_id')
+                .or(`buyer_id.eq.${user.id},seller_id.eq.${user.id}`)
+                .order('id', { ascending: false });
+
+            if (error) {
+                console.error("Conversations load error:", error);
+                list.innerHTML = `<div class="notif-empty"><i class="fas fa-exclamation-circle"></i>Failed to load</div>`;
+                return;
+            }
+
+            if (!convs || convs.length === 0) {
+                list.innerHTML = `<div class="notif-empty"><i class="fas fa-comment-slash"></i>No conversations yet</div>`;
+                badge.style.display = 'none';
+                return;
+            }
+
+            // Step 2: Collect all unique user IDs we need profiles for
+            const allUserIds = [...new Set(
+                convs.flatMap(c => [c.buyer_id, c.seller_id])
+            )];
+
+            // Step 3: Fetch all those profiles in one query
+            const { data: profiles } = await _supabase
+                .from('profiles')
+                .select('id, first_name, last_name, avatar_url')
+                .in('id', allUserIds);
+
+            // Build a quick lookup map: { userId -> profile }
+            const profileMap = {};
+            (profiles || []).forEach(p => { profileMap[p.id] = p; });
+
+            // Step 4: Collect all product IDs and fetch titles in one query
+            const productIds = [...new Set(convs.map(c => c.product_id))];
+            const { data: products } = await _supabase
+                .from('products')
+                .select('id, title')
+                .in('id', productIds);
+
+            const productMap = {};
+            (products || []).forEach(p => { productMap[p.id] = p; });
+
+            // Step 5: Fetch last message for each conversation in parallel
+            const lastMsgResults = await Promise.all(
+                convs.map(c =>
+                    _supabase
+                        .from('messages')
+                        .select('content, is_buyer')
+                        .eq('conversation_id', c.id)
+                        .order('created_at', { ascending: false })
+                        .limit(1)
+                        .maybeSingle()
+                )
+            );
+
+            // Step 6: Render
+            badge.textContent   = convs.length;
+            badge.style.display = 'flex';
+            label.textContent   = `${convs.length} total`;
+            list.innerHTML      = '';
+
+            convs.forEach((conv, i) => {
+                const iAmBuyer   = conv.buyer_id === user.id;
+                const otherId    = iAmBuyer ? conv.seller_id : conv.buyer_id;
+                const other      = profileMap[otherId] || null;
+                const otherName  = other
+                    ? (`${other.first_name || ''} ${other.last_name || ''}`).trim() || 'Unknown'
+                    : 'Unknown';
+                const otherAvatar   = other?.avatar_url || null;
+                const productTitle  = productMap[conv.product_id]?.title || 'Untitled Product';
+                const tagClass      = iAmBuyer ? 'tag-buyer'  : 'tag-seller';
+                const tagLabel      = iAmBuyer ? 'Seller'      : 'Buyer';
+
+                // Last message preview
+                const lastMsg = lastMsgResults[i]?.data;
+                let lastMsgText = 'No messages yet';
+                if (lastMsg) {
+                    // is_buyer=true means the buyer sent it
+                    const sentByMe = iAmBuyer ? lastMsg.is_buyer : !lastMsg.is_buyer;
+                    const senderLabel = sentByMe ? 'You' : otherName.split(' ')[0];
+                    lastMsgText = `${senderLabel}: ${lastMsg.content}`;
+                }
+
+                const avatarHtml = otherAvatar
+                    ? `<img src="${otherAvatar}" alt="${escapeHtml(otherName)}">`
+                    : `<i class="fas fa-user"></i>`;
+
+                const item = document.createElement('a');
+                item.className = 'notif-item';
+                item.href = `conversation.html?conversation_id=${conv.id}`;
+                item.innerHTML = `
+                    <div class="notif-avatar">${avatarHtml}</div>
+                    <div class="notif-body">
+                        <div class="notif-name">${escapeHtml(otherName)}</div>
+                        <div class="notif-product">${escapeHtml(productTitle)}</div>
+                        <div class="notif-last-msg">${escapeHtml(lastMsgText)}</div>
+                    </div>
+                    <span class="notif-tag ${tagClass}">${tagLabel}</span>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        }
+
+        // ════════════════════════════════════════════════════════════
+        //  PROFILE
+        // ════════════════════════════════════════════════════════════
+        async function loadProfile() {
+            const { data: { user }, error: userError } = await _supabase.auth.getUser();
+            if (userError || !user) { console.log("No active session found"); return; }
+
+            let { data: profile } = await _supabase
+                .from('profiles')
+                .select('avatar_url, first_name, last_name, email, contact')
+                .eq('id', user.id)
+                .single();
+
+            const emailField = document.getElementById('profile-email');
+            emailField.value = (profile && profile.email) ? profile.email : user.email;
+
+            if (profile) {
+                document.getElementById('profile-fname').value    = profile.first_name || '';
+                document.getElementById('profile-lname').value    = profile.last_name  || '';
+                document.getElementById('profile-contact').value  = profile.contact    || '';
+                document.getElementById('profile-password').value = '';
+                if (profile.avatar_url) {
+                    document.getElementById('profile-img-display').src = profile.avatar_url;
+                    document.getElementById('profile-img-display').classList.remove('hidden');
+                    document.getElementById('profile-icon-placeholder').classList.add('hidden');
+                }
+            }
+            handleUserViewToggle()
+            loadConversations();
+        }
+
+        window.onload = loadProfile;
+        window.addEventListener('load', fetchMyAds);
+
+        let currentEditingAdId = null;
+
+        function previewImages() {
+            const container = document.getElementById('image-preview-container');
+            const files = document.getElementById('ad-images').files;
+            container.innerHTML = '';
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.className = "relative w-20 h-20 border-2 border-black rounded-lg overflow-hidden bg-gray-100";
+                    div.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+                    container.appendChild(div);
+                }
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function deleteAd(adId) {
+            if (!confirm("Are you sure you want to delete this ad?")) return;
+            try {
+                const { data: ad } = await _supabase.from('products').select('image_urls').eq('id', adId).single();
+                if (ad?.image_urls?.length > 0) {
+                    const pathsToDelete = ad.image_urls.map(url => {
+                        try {
+                            const urlObj = new URL(url);
+                            const part = urlObj.pathname.split('/storage/v1/object/public/product-images/')[1];
+                            return part ? decodeURIComponent(part) : null;
+                        } catch { return null; }
+                    }).filter(Boolean);
+                    if (pathsToDelete.length > 0)
+                        await _supabase.storage.from('product-images').remove(pathsToDelete);
+                }
+                const { error } = await _supabase.from('products').delete().eq('id', adId);
+                if (error) throw error;
+                fetchMyAds();
+            } catch (err) { alert("Delete failed: " + err.message); }
+        }
+
+        async function handlePublishAd() {
+            const title       = document.getElementById('ad-title').value;
+            const price       = document.getElementById('ad-price').value;
+            const category    = document.getElementById('ad-category').value;
+            const condition   = document.getElementById('ad-condition').value;
+            const description = document.getElementById('ad-desc').value;
+            const imageFiles  = document.getElementById('ad-images').files;
+            if (!title || !price) return alert("Please provide a title and price.");
+            try {
+                const { data: { user } } = await _supabase.auth.getUser();
+                let imageUrls = [];
+                if (currentEditingAdId && imageFiles.length > 0) {
+                    const { data: oldAd } = await _supabase.from('products').select('image_urls').eq('id', currentEditingAdId).single();
+                    if (oldAd?.image_urls?.length > 0) {
+                        const pathsToDelete = oldAd.image_urls.map(url => {
+                            try {
+                                const urlObj = new URL(url);
+                                const part = urlObj.pathname.split('/storage/v1/object/public/product-images/')[1];
+                                return part ? decodeURIComponent(part) : null;
+                            } catch { return null; }
+                        }).filter(Boolean);
+                        if (pathsToDelete.length > 0)
+                            await _supabase.storage.from('product-images').remove(pathsToDelete);
+                    }
+                }
+                if (imageFiles.length > 0) {
+                    for (const file of imageFiles) {
+                        const fileName = `${Date.now()}_${file.name}`;
+                        const { error: upError } = await _supabase.storage.from('product-images').upload(fileName, file);
+                        if (upError) throw upError;
+                        const { data: publicData } = _supabase.storage.from('product-images').getPublicUrl(fileName);
+                        imageUrls.push(publicData.publicUrl);
+                    }
+                }
+                const adData = { title, price: parseFloat(price), category, condition, description, user_id: user.id };
+                if (imageUrls.length > 0) adData.image_urls = imageUrls;
+                if (currentEditingAdId) {
+                    const { error } = await _supabase.from('products').update(adData).eq('id', currentEditingAdId);
+                    if (error) throw error;
+                    alert("Ad Updated!");
+                } else {
+                    if (imageUrls.length === 0) return alert("Please choose at least one image.");
+                    const { error } = await _supabase.from('products').insert([adData]);
+                    if (error) throw error;
+                    alert("Ad Published!");
+                }
+                resetForm();
+                fetchMyAds();
+            } catch (err) { alert("Action failed: " + err.message); }
+        }
+
+        async function fetchMyAds() {
+            const container  = document.getElementById('my-ads-container');
+            const countBadge = document.getElementById('ad-count');
+            try {
+                const { data: { user } } = await _supabase.auth.getUser();
+                if (!user) return;
+                const { data: ads, error } = await _supabase
+                    .from('products').select('*').eq('user_id', user.id)
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+                countBadge.innerText = `${ads.length} ADS`;
+                if (ads.length === 0) {
+                    container.innerHTML = `<p class="text-gray-400 text-sm italic col-span-full text-center py-10">You haven't posted any ads yet.</p>`;
+                    return;
+                }
+                container.innerHTML = '';
+                ads.forEach(ad => {
+                    const displayImage = ad.image_urls?.length > 0 ? ad.image_urls[0] : 'https://via.placeholder.com/150?text=No+Image';
+                    container.innerHTML += `
+                        <div class="border-2 border-black rounded-2xl p-4 relative ${ad.paid_ad ? 'bg-amber-200' : 'bg-gray-200'} transition-transform hover:scale-[1.02]">
+                            <div class="absolute top-2 right-2 flex space-x-2 z-10">
+                                <i onclick="prepareEdit('${ad.id}')" class="fas fa-pen-to-square text-blue-600 action-btn cursor-pointer" title="Edit"></i>
+                                <i onclick="deleteAd('${ad.id}')" class="fas fa-circle-xmark text-red-500 action-btn cursor-pointer" title="Delete"></i>
+                                <i onclick="${ad.paid_ad ? "alert('This ad is already boosted!')" : `boostAd('${ad.id}')`}" class="fas fa-rocket text-blue-500 action-btn cursor-pointer" title="Boost_Ad"></i>
+                            </div>
+                            <div class="w-full h-32 mb-4 overflow-hidden rounded-lg border border-gray-100">
+                                <img src="${displayImage}" class="w-full h-full object-cover" alt="${ad.title}">
+                            </div>
+                            <h3 class="font-bold text-sm truncate">${ad.title}</h3>
+                            <p class="text-xs text-gray-600 font-bold">Rs ${ad.price.toLocaleString()}</p>
+                            <span class="text-[9px] uppercase font-extrabold text-gray-400 border border-gray-200 px-2 py-0.5 rounded mt-2 inline-block">${ad.category}</span>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                console.error("Error fetching ads:", err);
+                container.innerHTML = `<p class="text-red-500 text-sm col-span-full">Failed to load ads.</p>`;
+            }
+        }
+
+        function boostAd(ad_id) {
+            document.getElementById('targetAdId').value = ad_id;
+            const modal = document.getElementById('boostModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        async function validateAndSubmit() {
+            const adId   = document.getElementById('targetAdId').value;
+            const card   = document.getElementById('cardNumber').value.replace(/\s/g, '');
+            const expiry = document.getElementById('expiry').value;
+            const cvv    = document.getElementById('cvv').value;
+            if (!/^[0-9]{16}$/.test(card))   return alert("Invalid Card Number (16 digits required)");
+            if (!/^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(expiry)) return alert("Invalid Expiry (MM/YY)");
+            if (!/^[0-9]{3}$/.test(cvv))      return alert("Invalid CVV (3 digits)");
+            try {
+                const { data: { user }, error: authError } = await _supabase.auth.getUser();
+                if (authError || !user) { alert("You must be logged in to boost an ad."); return; }
+                const { error } = await _supabase.from('products')
+                    .update({ paid_ad: true }).eq('id', adId).eq('user_id', user.id);
+                if (error) throw error;
+                alert("🚀 Payment Successful! Your ad has been boosted.");
+                closeBoostModal();
+                location.reload();
+            } catch (error) { alert("Error updating ad: " + error.message); }
+        }
+
+        function closeBoostModal() {
+            const modal = document.getElementById('boostModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('profile-img-display');
+                    img.src = e.target.result;
+                    img.classList.remove('hidden');
+                    document.getElementById('profile-icon-placeholder').classList.add('hidden');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function updateFullProfile() {
+            const btn = document.getElementById('save-profile-btn');
+            btn.innerText = "Saving...";
+            btn.disabled = true;
+            try {
+                const { data: { user } } = await _supabase.auth.getUser();
+                if (!user) throw new Error("You must be logged in.");
+                const cont_num = document.getElementById('profile-contact').value.trim();
+                if (!/^[0-9]{11}$/.test(cont_num)) return alert("Invalid Contact Number (11 digits required)");
+                let avatarUrl = null;
+                const { data: currentProfile } = await _supabase.from('profiles').select('avatar_url').eq('id', user.id).single();
+                if (currentProfile) avatarUrl = currentProfile.avatar_url;
+                const fileInput = document.getElementById('avatar-file');
+                if (fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    if (avatarUrl && avatarUrl.includes('/storage/v1/object/public/avatars/')) {
+                        try {
+                            const urlObj = new URL(avatarUrl);
+                            const oldPath = urlObj.pathname.split('/storage/v1/object/public/avatars/')[1];
+                            if (oldPath) await _supabase.storage.from('avatars').remove([decodeURIComponent(oldPath)]);
+                        } catch (e) { console.warn("Could not parse old avatar URL:", e); }
+                    }
+                    const fileExt  = file.name.split('.').pop();
+                    const filePath = `${user.id}/avatar-${Date.now()}.${fileExt}`;
+                    const { error: uploadError } = await _supabase.storage.from('avatars').upload(filePath, file, { upsert: true });
+                    if (uploadError) throw uploadError;
+                    const { data: urlData } = _supabase.storage.from('avatars').getPublicUrl(filePath);
+                    avatarUrl = urlData.publicUrl;
+                }
+                const profileUpdates = {
+                    id: user.id,
+                    first_name:  document.getElementById('profile-fname').value.trim(),
+                    last_name:   document.getElementById('profile-lname').value.trim(),
+                    avatar_url:  avatarUrl,
+                    updated_at:  new Date().toISOString(),
+                    contact:     cont_num,
+                };
+                const { error: dbError } = await _supabase.from('profiles').upsert(profileUpdates, { onConflict: 'id' });
+                if (dbError) throw dbError;
+                const newPass = document.getElementById('profile-password').value;
+                if (newPass && newPass.length > 0) {
+                    if (newPass.length < 6) throw new Error("Password must be at least 6 characters.");
+                    const { error: authError } = await _supabase.auth.updateUser({ password: newPass });
+                    if (authError) throw authError;
+                    document.getElementById('profile-password').value = "";
+                }
+                alert("Profile updated successfully!");
+            } catch (error) {
+                console.error("Update failed:", error);
+                alert(`Error: ${error.message}`);
+            } finally {
+                btn.innerText = "Save Changes";
+                btn.disabled = false;
+            }
+        }
+
+        async function prepareEdit(adId) {
+            currentEditingAdId = adId;
+            try {
+                const { data: ad, error } = await _supabase.from('products').select('*').eq('id', adId).single();
+                if (error) throw error;
+                document.getElementById('ad-title').value     = ad.title;
+                document.getElementById('ad-price').value     = ad.price;
+                document.getElementById('ad-category').value  = ad.category;
+                document.getElementById('ad-condition').value = ad.condition;
+                document.getElementById('ad-desc').value      = ad.description;
+                document.getElementById('form-title').innerHTML = '<i class="fas fa-edit mr-3"></i> Update Existing Ad';
+                document.getElementById('submit-btn').innerHTML = 'Update Ad <i class="fas fa-check ml-2 text-xs"></i>';
+                document.getElementById('submit-btn').classList.replace('bg-black', 'bg-blue-600');
+                document.getElementById('reset-btn').classList.remove('hidden');
+                document.getElementById('upload-section').scrollIntoView({ behavior: 'smooth' });
+            } catch (err) { alert("Error fetching ad data: " + err.message); }
+        }
+
+        function resetForm() {
+            currentEditingAdId = null;
+            document.getElementById('ad-title').value     = '';
+            document.getElementById('ad-price').value     = '';
+            document.getElementById('ad-category').value  = '';
+            document.getElementById('ad-condition').value = '';
+            document.getElementById('ad-desc').value      = '';
+            document.getElementById('ad-images').value    = '';
+            document.getElementById('image-preview-container').innerHTML = '';
+            document.getElementById('form-title').innerHTML = '<i class="fas fa-upload mr-3"></i> Upload Ad';
+            document.getElementById('submit-btn').innerHTML = 'Publish Ad <i class="fas fa-paper-plane ml-2 text-xs"></i>';
+            document.getElementById('submit-btn').classList.remove('bg-blue-600');
+            document.getElementById('submit-btn').classList.add('bg-black');
+            document.getElementById('reset-btn').classList.add('hidden');
+        }
+        async function checkIfTechnician() {
+            const { data: { user }, error: userError } = await _supabase.auth.getUser();
+
+            if (userError || !user) return false;
+            const { data, error } = await _supabase
+                .from('technicians')
+                .select('id')
+                .eq('id', user.id)
+                .maybeSingle()
+            if (error) {
+                console.error("Error checking technician status:", error);
+                return false;
+            }
+
+            // 3. Return true if data exists, false if it's null
+            return data !== null;
+        }
+        async function handleUserViewToggle() {
+            // Determine technician status
+            const isTech = await checkIfTechnician();
+            const applySection = document.getElementById('apply-tech');
+            const promoSection = document.getElementById('tech-promo');
+
+            if (isTech) {
+                // User is a technician: Show the Dashboard link, hide the application form
+                if (promoSection) promoSection.style.display = 'block';
+                if (applySection) applySection.style.display = 'none';
+            } else {
+                // User is a customer: Show the "Become a Technician" application CTA
+                if (promoSection) promoSection.style.display = 'none';
+                if (applySection) applySection.style.display = 'block';
+            }
+        }
+        async function checkUser() {
+            const { data: { user } } = await _supabase.auth.getUser();
+            if (!user) window.location.href = 'registration.html';
+        }
+        checkUser();
+
+        async function handleLogout() {
+            await _supabase.auth.signOut();
+            window.location.href = 'registration.html';
+        }
+    </script>
+</body>
+</html>

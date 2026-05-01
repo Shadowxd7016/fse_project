@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>FixKar - Request Repair Service</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, 'Segoe UI', 'Poppins', sans-serif;
+            background: #f5f7fb;
+            color: #1e293b;
+        }
+
+        /* Navbar Styles */
+        #navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: white;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            flex-wrap: wrap;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .nav-right {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .nav-right a {
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .nav-right a:hover {
+            color: #e67e22;
+        }
+        #auth-btn {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        #auth-btn:hover {
+            background: #e67e22;
+        }
+        #back-btn {
+            display: inline-block;
+            margin: 20px 0 10px 30px;
+            text-decoration: none;
+            color: #e67e22;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        /* Main Product Container */
+        .product-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px 40px;
+        }
+        .product-card {
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .product-image {
+            flex: 1.2;
+            background: #fef5e8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+        .product-image img {
+            max-width: 100%;
+            max-height: 320px;
+            object-fit: contain;
+            transition: 0.3s;
+        }
+        .product-info {
+            flex: 1.5;
+            padding: 40px 36px;
+        }
+        .product-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 12px;
+        }
+        .product-price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #e67e22;
+            margin: 16px 0;
+        }
+        .product-description {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #475569;
+            margin-bottom: 28px;
+        }
+        /* REPAIR BUTTON (on product description) */
+        .repair-action-btn {
+            background: linear-gradient(95deg, #e67e22, #f39c12);
+            border: none;
+            padding: 14px 28px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 18px rgba(230,126,34,0.3);
+            margin-top: 8px;
+        }
+        .repair-action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(230,126,34,0.4);
+        }
+        /* Technician Grid / Selection Page (repair form) */
+        .repair-page {
+            max-width: 1300px;
+            margin: 30px auto 60px;
+            padding: 0 24px;
+        }
+        .repair-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .repair-header h1 {
+            font-size: 2rem;
+            color: #1e293b;
+        }
+        .repair-header p {
+            color: #5b6e8c;
+            margin-top: 8px;
+        }
+        .technician-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 28px;
+            margin-bottom: 40px;
+        }
+        .tech-card {
+            background: white;
+            border-radius: 28px;
+            padding: 1.5rem;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+            transition: 0.2s;
+            border: 1px solid #edf2f7;
+            cursor: pointer;
+            position: relative;
+        }
+        .tech-card.selected {
+            border: 2.5px solid #e67e22;
+            background: #fffaf5;
+            box-shadow: 0 20px 30px -10px rgba(230,126,34,0.2);
+        }
+        .tech-badge {
+            position: absolute;
+            top: 18px;
+            right: 20px;
+            background: #eef2ff;
+            padding: 5px 12px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #e67e22;
+        }
+        .tech-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 12px 0 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .tech-id {
+            background: #f1f5f9;
+            font-family: monospace;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #334155;
+        }
+        .tech-expertise {
+            color: #e67e22;
+            font-weight: 600;
+            margin: 12px 0 8px;
+            font-size: 0.9rem;
+        }
+        .tech-rating {
+            color: #fbbf24;
+            letter-spacing: 2px;
+            margin: 8px 0;
+        }
+        .tech-contact {
+            font-size: 0.85rem;
+            color: #4b5563;
+            margin-top: 8px;
+            word-break: break-word;
+        }
+        .apply-repair-btn {
+            background: #e67e22;
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            border: none;
+            border-radius: 44px;
+            font-weight: bold;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .apply-repair-btn:disabled {
+            background: #b0bec5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .apply-repair-btn:hover:not(:disabled) {
+            background: #d35400;
+            transform: scale(1.02);
+        }
+        .back-to-product {
+            display: inline-block;
+            margin-bottom: 25px;
+            color: #e67e22;
+            font-weight: 600;
+            text-decoration: none;
+            background: #fff;
+            padding: 8px 20px;
+            border-radius: 40px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        footer {
+            background: #0f172a;
+            color: #cbd5e1;
+            padding: 40px 20px 20px;
+            margin-top: 60px;
+        }
+        .footer-container {
+            max-width: 1200px;
+            margin: auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 30px;
+        }
+        .footer-logo {
+            font-size: 1.6rem;
+            color: #f39c12;
+        }
+        .footer-section a {
+            display: block;
+            color: #94a3b8;
+            text-decoration: none;
+            margin: 8px 0;
+        }
+        .footer-bottom {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.8rem;
+        }
+        .toast-msg {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 60px;
+            font-weight: 500;
+            z-index: 2000;
+            opacity: 0;
+            transition: 0.2s;
+            pointer-events: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .hidden {
+            display: none;
+        }
+        @media (max-width: 750px) {
+            .product-card { flex-direction: column; }
+            .product-info { padding: 28px; }
+        }
+    </style>
+</head>
+<body>
+    <nav id="navbar">
+        <div class="nav-left"><h2 class="logo">FixKar</h2></div>
+        <div class="nav-right">
+            <a href="home.html">Home</a>
+            <a href="About us.html">About Us</a>
+            <a href="Contact Us.html">Contact Us</a>
+            <button id="auth-btn">Sign In</button>
+        </div>
+    </nav>
+    <a id="back-btn" href="home.html" id="global-back">← Back to Home</a>
+
+    <!-- PRODUCT DETAIL SECTION (visible by default) -->
+    <div id="productSection" class="product-wrapper">
+        <div id="product-detail"></div>
+    </div>
+
+    <!-- REPAIR FORM / TECHNICIAN SELECTION SECTION (hidden initially) -->
+    <div id="repairSection" class="repair-page hidden">
+        <a href="#" id="backToProductBtn" class="back-to-product">← Back to Product</a>
+        <div class="repair-header">
+            <h1>🔧 Select a Technician</h1>
+            <p>Choose the right expert for your repair request. Their ID, expertise & contact are listed below.</p>
+        </div>
+        <div id="technicianListContainer" class="technician-grid">
+            <!-- Dynamic technicians cards will appear here with IDs -->
+        </div>
+        <div style="display: flex; justify-content: center; margin-top: 20px;">
+            <button id="finalApplyRepairBtn" class="apply-repair-btn" disabled>✅ Apply for Repair</button>
+        </div>
+    </div>
+
+    <div id="toastMessage" class="toast-msg"></div>
+
+    <footer id="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h2 class="footer-logo">FixKar</h2>
+                <p>Buy & Sell easily</p>
+                <div class="socials"><a href="#">Facebook</a> <a href="#">Instagram</a> <a href="#">Twitter</a></div>
+            </div>
+            <div class="footer-section"><h3>Categories</h3><a href="#">Electronics</a><a href="#">Clothing</a><a href="#">Others</a></div>
+            <div class="footer-section"><h3>Company</h3><a href="#">About Us</a><a href="#">Contact Us</a></div>
+        </div>
+        <p class="footer-bottom">© 2026 FixKar. All rights reserved.</p>
+    </footer>
+
+    <script src="supabase_config.js"></script>
+    <script src="navbar.js"></script>
+    <script>
+        // ---------- GLOBALS ----------
+        let currentProduct = null;
+        let techniciansData = [];      // store technicians with ID, name, expertise, rating, contact
+        let selectedTechnicianId = null;
+        
+        // DOM elements
+        const productDetailDiv = document.getElementById('product-detail');
+        const productSection = document.getElementById('productSection');
+        const repairSection = document.getElementById('repairSection');
+        const technicianContainer = document.getElementById('technicianListContainer');
+        const finalApplyBtn = document.getElementById('finalApplyRepairBtn');
+        const backToProductBtn = document.getElementById('backToProductBtn');
+        const toastDiv = document.getElementById('toastMessage');
+
+        // Helper: show toast message
+        function showToast(message, isError = false) {
+            toastDiv.textContent = message;
+            toastDiv.style.background = isError ? '#c2410c' : '#2c3e50';
+            toastDiv.style.opacity = '1';
+            setTimeout(() => { toastDiv.style.opacity = '0'; }, 2800);
+        }
+
+        // get product ID from URL
+        function getProductIdFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        // Load product details (demo or from localStorage)
+        async function loadProductDetail() {
+            const productId = getProductIdFromUrl();
+            let product = null;
+            try {
+                const stored = localStorage.getItem('market_products');
+                if (stored && productId) {
+                    const products = JSON.parse(stored);
+                    product = products.find(p => p.id == productId);
+                }
+            } catch(e) {}
+
+            // Fallback product if none found
+            if (!product) {
+                product = {
+                    id: productId || 'p1001',
+                    name: 'Samsung Galaxy S23 Ultra',
+                    price: '₨ 289,999',
+                    description: 'Dynamic AMOLED 2X, 200MP Camera, Snapdragon 8 Gen 2. This flagship device deserves professional repair service. Get it fixed by certified technicians with genuine parts.',
+                    image: 'https://placehold.co/600x400?text=Galaxy+S23+Ultra'
+                };
+            }
+            currentProduct = product;
+            
+            // Render product HTML + add "Request Repair" button inside description area
+            const productHTML = `
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="${product.image || 'https://placehold.co/500x400?text=FixKar+Product'}" alt="${product.name}">
+                    </div>
+                    <div class="product-info">
+                        <h1 class="product-title">${product.name}</h1>
+                        <div class="product-price">${product.price}</div>
+                        <p class="product-description">${product.description}</p>
+                        <!-- REQUEST REPAIR BUTTON (inside description) -->
+                        <button id="requestRepairBtn" class="repair-action-btn">
+                            🔧 Request Repair &nbsp;→
+                        </button>
+                    </div>
+                </div>
+            `;
+            productDetailDiv.innerHTML = productHTML;
+            
+            // Attach event to the repair button (redirect to repair form)
+            const repairBtn = document.getElementById('requestRepairBtn');
+            if (repairBtn) {
+                repairBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    // load technicians and go to repair selection form
+                    loadTechniciansAndShowRepairForm();
+                });
+            }
+        }
+
+        // Load technicians (from Supabase if exists, else demo data with IDs)
+        async function fetchTechnicians() {
+            // Simulate technicians data with proper IDs & contact info.
+            // Priority: if supabase client exists and table 'technicians' is accessible, fetch else fallback.
+            let techs = [];
+            try {
+                // check if supabase client initialized globally (from supabase_config.js)
+                if (window.supabase && window.supabaseClient) {
+                    const { data, error } = await window.supabaseClient
+                        .from('technicians')
+                        .select('id, name, expertise, rating, contact, avatar');
+                    if (!error && data && data.length) {
+                        techs = data.map(t => ({ ...t, id: t.id, rating: t.rating || 4.5 }));
+                    } else {
+                        throw new Error('fallback');
+                    }
+                } else {
+                    throw new Error('no supabase');
+                }
+            } catch(err) {
+                console.log("Using demo technician dataset with proper IDs");
+                techs = [
+                    { id: 201, name: "Rahul Mehta", expertise: "Smartphone & Screen Repair", rating: 4.9, contact: "+92 300 1234567", years: 6 },
+                    { id: 202, name: "Sana Khalid", expertise: "Laptop & Motherboard", rating: 4.8, contact: "sana.tech@fixkar.com", years: 5 },
+                    { id: 203, name: "Imran Ali", expertise: "Electronics & Home Appliances", rating: 4.7, contact: "+92 321 7654321", years: 8 },
+                    { id: 204, name: "Zara Tariq", expertise: "Apple Certified (iPhone/Mac)", rating: 5.0, contact: "zara@ifixkar.com", years: 4 },
+                    { id: 205, name: "Faisal Khan", expertise: "Gaming Console & PC Hardware", rating: 4.85, contact: "faisal.k@repairhub.com", years: 7 }
+                ];
+            }
+            // ensure each technician has explicit ID field
+            return techs;
+        }
+
+        // Render technician selection grid (IDs appear clearly)
+        function renderTechnicianGrid(technicians) {
+            if (!technicianContainer) return;
+            technicianContainer.innerHTML = '';
+            technicians.forEach(tech => {
+                const card = document.createElement('div');
+                card.className = 'tech-card';
+                if (selectedTechnicianId === tech.id) card.classList.add('selected');
+                card.setAttribute('data-tech-id', tech.id);
+                // Star rating display
+                const fullStars = Math.floor(tech.rating || 4.5);
+                const starHtml = '★'.repeat(fullStars) + '☆'.repeat(5-fullStars);
+                card.innerHTML = `
+                    <div class="tech-badge">🛠️ Expert</div>
+                    <div class="tech-name">
+                        ${tech.name}
+                        <span class="tech-id">ID: ${tech.id}</span>
+                    </div>
+                    <div class="tech-expertise">🔧 ${tech.expertise || 'General Repair Specialist'}</div>
+                    <div class="tech-rating">${starHtml} ${tech.rating || 4.5}</div>
+                    <div class="tech-contact">📞 ${tech.contact || 'contact@fixkar.com'}</div>
+                    <div style="margin-top:12px; font-size:13px; color:#4b5563;">⚡ ${tech.years ? tech.years + ' years exp' : 'Verified technician'}</div>
+                `;
+                card.addEventListener('click', (e) => {
+                    // prevent conflict if clicking inner elements
+                    e.stopPropagation();
+                    // update selected technician id
+                    selectedTechnicianId = tech.id;
+                    // re-render grid to reflect selection
+                    renderTechnicianGrid(technicians);
+                    // enable apply button
+                    finalApplyBtn.disabled = false;
+                    showToast(`Technician ${tech.name} (ID: ${tech.id}) selected`, false);
+                });
+                technicianContainer.appendChild(card);
+            });
+            if (selectedTechnicianId === null) finalApplyBtn.disabled = true;
+            else finalApplyBtn.disabled = false;
+        }
+
+        // Main function to load technicians and switch to repair selection view
+        async function loadTechniciansAndShowRepairForm() {
+            // show loading state
+            showToast("Loading available technicians...", false);
+            try {
+                const techs = await fetchTechnicians();
+                techniciansData = techs;
+                // reset selected tech
+                selectedTechnicianId = null;
+                renderTechnicianGrid(techniciansData);
+                // switch UI: hide product section, show repair section
+                productSection.classList.add('hidden');
+                repairSection.classList.remove('hidden');
+                // also disable apply button initially
+                finalApplyBtn.disabled = true;
+                // store product info in data attribute for reference
+                if (currentProduct) {
+                    repairSection.setAttribute('data-product-id', currentProduct.id);
+                }
+            } catch(error) {
+                console.error(error);
+                showToast("Failed to load technicians. Please try again later.", true);
+            }
+        }
+
+        // handle final apply repair: submit request with selected technician
+        async function submitRepairRequest() {
+            if (!selectedTechnicianId) {
+                showToast("Please select a technician first", true);
+                return;
+            }
+            if (!currentProduct) {
+                showToast("Product information missing", true);
+                return;
+            }
+            const selectedTech = techniciansData.find(t => t.id == selectedTechnicianId);
+            if (!selectedTech) {
+                showToast("Invalid technician selection, please choose again", true);
+                return;
+            }
+            
+            // Build repair request object including technician ID and all info
+            const repairRequest = {
+                requestId: Date.now(),
+                productId: currentProduct.id,
+                productName: currentProduct.name,
+                technicianId: selectedTech.id,
+                technicianName: selectedTech.name,
+                technicianContact: selectedTech.contact,
+                expertise: selectedTech.expertise,
+                customerName: "Guest User",    // can be extended from auth later
+                status: "pending",
+                requestedAt: new Date().toISOString(),
+                message: `Repair request for ${currentProduct.name} with technician ID ${selectedTech.id}`
+            };
+            
+            // Save to localStorage + optionally supabase
+            try {
+                let existing = localStorage.getItem('repair_requests_fixkar');
+                let requests = existing ? JSON.parse(existing) : [];
+                requests.push(repairRequest);
+                localStorage.setItem('repair_requests_fixkar', JSON.stringify(requests));
+                
+                // try supabase insertion if available
+                if (window.supabaseClient) {
+                    await window.supabaseClient.from('repair_requests').insert([repairRequest]);
+                }
+                showToast(`Request sent to ${selectedTech.name} (ID: ${selectedTech.id}). Technician will contact you soon!`, false);
+                
+                // After successful submission, redirect back to product view after 2 seconds? just reset to product
+                setTimeout(() => {
+                    // go back to product page view
+                    productSection.classList.remove('hidden');
+                    repairSection.classList.add('hidden');
+                    selectedTechnicianId = null;
+                }, 1800);
+            } catch (err) {
+                console.warn(err);
+                showToast("Request submitted locally but sync failed. We'll notify technician.", false);
+                setTimeout(() => {
+                    productSection.classList.remove('hidden');
+                    repairSection.classList.add('hidden');
+                }, 1500);
+            }
+        }
+
+        // Back to product detail view without selecting
+        function backToProduct() {
+            productSection.classList.remove('hidden');
+            repairSection.classList.add('hidden');
+            selectedTechnicianId = null;
+        }
+
+        // Initialize page events and listeners
+        async function init() {
+            await loadProductDetail();
+            
+            // set up final apply button
+            if (finalApplyBtn) {
+                finalApplyBtn.addEventListener('click', submitRepairRequest);
+            }
+            if (backToProductBtn) {
+                backToProductBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    backToProduct();
+                });
+            }
+            // Also handle global back button? but that's fine.
+            const authBtn = document.getElementById('auth-btn');
+            if (authBtn) authBtn.addEventListener('click', () => showToast("Sign in to track requests", false));
+        }
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>

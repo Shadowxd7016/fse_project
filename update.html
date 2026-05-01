@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>FixKar - New Password</title>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-white">
+    <div class="max-w-sm w-full p-8 border-2 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <h2 class="text-2xl font-extrabold uppercase mb-4">Set New Password</h2>
+        <input type="password" id="new-password" placeholder="Enter new password" 
+               style="border:1.5px solid black; border-radius:0.75rem; padding:0.6rem; width:100%; outline:none; margin-bottom:1rem;">
+        
+        <button onclick="updatePassword()" 
+                style="background:black; color:white; border-radius:9999px; padding:0.8rem; width:100%; font-weight:600;">
+            UPDATE PASSWORD
+        </button>
+    </div>
+
+    <script>
+       const _supabase = supabase.createClient('https://lvfbcbgmosfrpwvmrfhp.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2ZmJjYmdtb3NmcnB3dm1yZmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0Mjc3MTEsImV4cCI6MjA4OTAwMzcxMX0.CMvOjwLs_1sDunNpphV5niv668Y459TwfzxDLioXx8c');
+
+        async function updatePassword() {
+            const newPassword = document.getElementById('new-password').value;
+
+            if (newPassword.length < 6) {
+                alert("Password must be at least 6 characters.");
+                return;
+            }
+
+            const { error } = await _supabase.auth.updateUser({ password: newPassword });
+
+            if (error) {
+                alert("Error updating password: " + error.message);
+            } else {
+                alert("Password updated successfully! You can now log in.");
+                window.location.href = 'registration.html';
+            }
+        }
+    </script>
+</body>
+</html>
