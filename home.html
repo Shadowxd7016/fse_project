@@ -1,28 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-
-<style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FixKar | Buy Smart. Sell Fast.</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .profile-icon {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .auth-btn:hover {
+            transform: scale(1.1);
+        }
     </style>
 </head>
 
-<body>
-  
-<nav id="navbar">
+<body class="bg-gray-50">
+
+  <nav id="navbar">
         <div class="nav-left">
             <h2 class="logo">FixKar</h2>
         </div>
@@ -35,86 +39,62 @@
             <button id="auth-btn">Sign Up</button>
         </div>
     </nav>
+    <section class="bg-gray-900 text-white py-24 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6 italic">Buy Smart. <span class="text-red-500">Sell Fast.</span></h1>
+            <p class="text-lg text-gray-400 mb-10">Find the best deals on phones, cars, furniture, and more.</p>
+            
+            <div class="relative max-w-xl mx-auto">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+                <input type="text" id="searchInput" placeholder="What are you looking for today?" 
+                       class="w-full py-4 pl-12 pr-4 rounded-full bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 shadow-xl">
+            </div>
+        </div>
+    </section>
 
+    <div id="search-results-section" class="hidden mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <h2 id="search-title" class="text-2xl font-bold tracking-tight text-gray-900">Search Results</h2>
+        <div id="search-grid" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4"></div>
+    </div>
 
-<section class="bg-gray-900 text-white py-20 px-4">
-  
-  <div class="max-w-4xl mx-auto text-center">
-    <h1 class="text-4xl md:text-6xl font-bold mb-6">Buy Smart. Sell Fast.</h1>
-    <p class="text-lg text-gray-400 mb-10">Find the best deals on phones, cars, furniture, and more.</p>
-    
-<div class="relative max-w-xl mx-auto">
-  <input type="text" id="searchInput" placeholder="What are you looking for today?" 
-         class="w-full py-4 pl-12 pr-4 rounded-full bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500">
-  </div>
+    <div id="all-categories" class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold tracking-tight text-gray-900 flex items-center">
+            <span class="material-symbols-outlined mr-2">smartphone</span> Mobile Phones
+        </h2>
+        <div id="grid-mobile" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 mb-16"></div>
 
+        <h2 class="text-2xl font-bold tracking-tight text-gray-900 flex items-center">
+            <span class="material-symbols-outlined mr-2">laptop_mac</span> Laptops
+        </h2>
+        <div id="grid-laptop" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 mb-16"></div>
 
+        <h2 class="text-2xl font-bold tracking-tight text-gray-900 flex items-center">
+            <span class="material-symbols-outlined mr-2">tablet_android</span> Tablets
+        </h2>
+        <div id="grid-tablet" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 mb-16"></div>
 
-<div id="category-sections" class="block">
-   </div>
-  </div>
-</section>
-<div id="search-results-section" class="hidden mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:max-w-7xl lg:px-8">
-  <h2 id="search-title" class="text-2xl font-bold tracking-tight text-gray-900">Search Results</h2>
-  <div id="search-grid" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8"></div>
-</div>
- <div id="all-categories" class="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-  <h2 class="text-2xl font-bold tracking-tight text-gray-900">Mobile Phones</h2>
-  <div id="grid-mobile" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8 mb-12"></div>
+        <h2 class="text-2xl font-bold tracking-tight text-gray-900 flex items-center">
+            <span class="material-symbols-outlined mr-2">photo_camera</span> Cameras
+        </h2>
+        <div id="grid-camera" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4"></div>
+    </div>
 
-  <h2 class="text-2xl font-bold tracking-tight text-gray-900">Laptops</h2>
-  <div id="grid-laptop" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8 mb-12"></div>
+    <footer id="footer" class="bg-white border-t border-gray-200 pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="text-xl font-bold italic mb-4">Fix<span class="text-red-600">Kar</span></h2>
+            <p class="text-gray-500 text-sm mb-8">The most trusted marketplace for verified professionals and smart buyers.</p>
+            <div class="flex justify-center space-x-6 mb-8 text-gray-400">
+                <a href="#" class="hover:text-red-600">Facebook</a>
+                <a href="#" class="hover:text-red-600">Twitter</a>
+                <a href="#" class="hover:text-red-600">Instagram</a>
+            </div>
+            <p class="text-xs text-gray-400 border-t border-gray-100 pt-8">&copy; 2026 FixKar Inc. All rights reserved.</p>
+        </div>
+    </footer>
 
-  <h2 class="text-2xl font-bold tracking-tight text-gray-900">Tablets</h2>
-  <div id="grid-tablet" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8 mb-12"></div>
-
-  <h2 class="text-2xl font-bold tracking-tight text-gray-900">Cameras</h2>
-  <div id="grid-camera" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8"></div>
-</div>
-
-
-
-
-  <footer id = "footer"></footer>
-
-  <script src="supabase_config.js"></script>
-  <script src="script.js"></script>
-  <script type = "module" src="js/component.js"></script>
-  <footer id="footer">
-    <div class="footer-container">
-
-
-<div id="category-sections" class="block">
-   </div>
-  </div>
-</section>
-<div id="search-results-section" class="hidden mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:max-w-7xl lg:px-8">
-  <h2 id="search-title" class="text-2xl font-bold tracking-tight text-gray-900">Search Results</h2>
-  <div id="search-grid" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8"></div>
-</div>
- <div id="all-categories" class="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-  <h2 class="text-2xl font-bold tracking-tight text-gray-900">Mobile Phones</h2>
-  <div id="grid-mobile" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8 mb-12"></div>
-
-  <h2 class="text-2xl font-bold tracking-tight text-gray-900">Laptops</h2>
-  <div id="grid-laptop" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8 mb-12"></div>
-
-  <h2 class="text-2xl font-bold tracking-tight text-gray-900">Tablets</h2>
-  <div id="grid-tablet" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8 mb-12"></div>
-
-  <h2 class="text-2xl font-bold tracking-tight text-gray-900">Cameras</h2>
-  <div id="grid-camera" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8"></div>
-</div>
-
-
-
-
-  <footer id = "footer"></footer>
-
-  <script src="supabase_config.js"></script>
-  <script src="script.js"></script>
-  <script type = "module" src="js/component.js"></script>
-  <script src="navbar.js"></script>
+    <script src="supabase_config.js"></script>
+    <script src="script.js"></script>
+    <script type="module" src="js/component.js"></script>
+    <script src="navbar.js"></script>
 </body>
-
 </html>
