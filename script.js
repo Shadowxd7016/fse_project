@@ -1,81 +1,29 @@
+// 1. Declare data globally
+let allProductsData = []; 
+console.log("Script loaded, waiting for DOMContentLoaded...");
+// 2. This runs immediately to set up the "Watchman"
+const searchInput = document.getElementById('searchInput');
 
-// fetch data from supabase
-async function fetchProducts(filters = {}) {
-     let query = db.from('products').select('*');
-
-    // 🔍 Keyword search on title
-    if (filters.search && filters.search.trim() !== "") {
-        query = query.ilike('title', `%${filters.search.trim()}%`);
-    }
+searchInput.addEventListener('input', (e) => {
+    const searchTerm = e.target.value.toLowerCase().trim();
+    console.log("User is typing:", searchTerm); // Debugging line
     
+    // Call the filter function
+    handleSearch(searchTerm);
+});
 
-    const { data, error } = await query;
-
+async function initApp() {
+    // 3. Fetch data from Supabase
+    const { data, error } = await db.from('products').select('*');
+    
     if (error) {
-        console.error("Error fetching products:", error);
+        console.error("Supabase Error:", error);
         return;
     }
 
-    displayProducts(data);
-}
-
-function displayProducts(products) {
-    const electronicsDiv = document.getElementById("electronics");
-    const BooksDiv = document.getElementById("Books");
-    const services_Div = document.getElementById("Services");
-
-    electronicsDiv.innerHTML = "";
-    BooksDiv.innerHTML = "";
-    services_Div.innerHTML = "";
-
-    products.forEach(product => {
-        const div = document.createElement("div");
-
-        const image = product.image_urls?.[0] || "fallback.jpg";
-
-        div.innerHTML = `
-            <img src="${image}" alt="${product.title}">
-            <h3>${product.title}</h3>
-            <p>${product.description}</p>
-            <p>Price: ${product.price}</p>
-        `;
-
-        // 👉 CORE LOGIC (you must understand this)
-        if (product.category === "Electronics") {
-            electronicsDiv.appendChild(div);
-        } 
-        else if (product.category === "Books") {
-            BooksDiv.appendChild(div);
-        } 
-        else if (product.category == "Services")
-        {
-            services_Div.appendChild(div);
-        }
-        div.onclick = () => {
-            window.location.href = `product.html?id=${product.id}`;
-        };
-    });
-}
-
-/* ── COLLECT & APPLY FILTERS ── */
-function applyFilters() {
-
-    const search   = document.getElementById("searchInput")?.value || "";
-    
-    fetchProducts({search});
-}
-
-/* ── LIVE SEARCH (fires as user types) ── */
-document.addEventListener("DOMContentLoaded", () => {
-    const searchInput = document.getElementById("searchInput");
-    if (searchInput) {
-        searchInput.addEventListener("input", () => applyFilters());
-    }
-    
-});
-
-function goToCategory(category) {
-    window.location.href = `category.html?category=${category}`;
+    allProductsData = data;
+    renderCategories(allProductsData); // Initial UI setup
+    console.log("Data loaded and ready for searching");
 }
 
 
@@ -141,7 +89,7 @@ function renderCategories(data) {
     'Mobile Phones': 'grid-mobile',
     'Laptops': 'grid-laptop',
     'Tablets': 'grid-tablet',
-    'Cameras': 'grid-camera' 
+    'Cameras': 'grid-camera'
   };
 
   Object.entries(categories).forEach(([name, gridId]) => {

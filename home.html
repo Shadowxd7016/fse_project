@@ -36,15 +36,6 @@
         <button id="auth-btn">Sign Up</button>
     </div>
 </nav>
-<div class="filter-group">
-        <input type="text" id="searchInput" placeholder="Search Products ....">
-      </div>
-  <div id="category-bar">
-    <button onclick="goToCategory('Electronics')">Electronics</button>
-    <button onclick="goToCategory('Books')">Books</button>
-    <button onclick="goToCategory('Services')">Services</button>
-</div>
-  <div class="product-container" id="categories">
 
 
 <section class="bg-gray-900 text-white py-20 px-4">
@@ -93,41 +84,37 @@
   <footer id="footer">
     <div class="footer-container">
 
-        <!-- Logo + Social -->
-        <div class="footer-section">
-            <h2 class="footer-logo">FixKar</h2>
-            <p>Buy & Sell easily</p>
 
-            <div class="socials">
-                <a href="#">Facebook</a>
-                <a href="#">Instagram</a>
-                <a href="#">Twitter</a>
-            </div>
-        </div>
+<div id="category-sections" class="block">
+   </div>
+  </div>
+</section>
+<div id="search-results-section" class="hidden mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:max-w-7xl lg:px-8">
+  <h2 id="search-title" class="text-2xl font-bold tracking-tight text-gray-900">Search Results</h2>
+  <div id="search-grid" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8"></div>
+</div>
+ <div id="all-categories" class="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+  <h2 class="text-2xl font-bold tracking-tight text-gray-900">Mobile Phones</h2>
+  <div id="grid-mobile" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8 mb-12"></div>
 
-        <!-- Categories -->
-        <div class="footer-section">
-            <h3>Categories</h3>
-            <a href="#">Electronics</a>
-            <a href="#">Clothing</a>
-            <a href="#">Others</a>
-        </div>
+  <h2 class="text-2xl font-bold tracking-tight text-gray-900">Laptops</h2>
+  <div id="grid-laptop" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8 mb-12"></div>
 
-        <!-- Company -->
-        <div class="footer-section">
-            <h3>Company</h3>
-            <a href="#">About Us</a>
-            <a href="#">Contact Us</a>
-        </div>
+  <h2 class="text-2xl font-bold tracking-tight text-gray-900">Tablets</h2>
+  <div id="grid-tablet" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8 mb-12"></div>
 
-    </div>
+  <h2 class="text-2xl font-bold tracking-tight text-gray-900">Cameras</h2>
+  <div id="grid-camera" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8"></div>
+</div>
 
-    <p class="footer-bottom">© 2026 MyMarket. All rights reserved.</p>
-</footer>
+
+
+
+  <footer id = "footer"></footer>
 
   <script src="supabase_config.js"></script>
   <script src="script.js"></script>
-  <script src = "navbar.js"></script>
+  <script type = "module" src="js/component.js"></script>
 </body>
 
 </html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>navbar</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+</head>
+<body>
+    <nav class="bg-white shadow-md px-6 h-20 flex items-center justify-between">
+
+        <!-- Left: Logo -->
+        <div class="flex items-center">
+            <!-- convert image to link -->
+            <a href="landingPage.html">
+                <img src="/images/logo.png" alt="Fixkar Logo" class="h-14 w-auto object-contain" />
+            </a>
+        </div>
+
+        <!-- Right: Links -->
+        <div class="flex items-center gap-6 text-gray-700 font-medium">
+            <a href="home.html" class="hover:text-blue-600 transition">Home</a>
+            <a href="About us.html" class="hover:text-blue-600 transition">About Us</a>
+            <a href="Contact Us.html" class="hover:text-blue-600 transition">Contact Us</a>
+
+            <button id="auth-btn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                Sign Up
+            </button>
+        </div>
+    </nav>
+
+    
+
+</body>
+</html>
