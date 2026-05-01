@@ -89,7 +89,7 @@ function renderCategories(data) {
     'Mobile Phones': 'grid-mobile',
     'Laptops': 'grid-laptop',
     'Tablets': 'grid-tablet',
-    'Cameras': 'grid-camera'
+    'Cameras': 'grid-camera' 
   };
 
   Object.entries(categories).forEach(([name, gridId]) => {
