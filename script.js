@@ -11,16 +11,40 @@ async function initApp() {
 
     allProductsData = data;
     renderCategories(allProductsData); 
+    
+    // Now defined locally - no more ReferenceError!
     setupSearchListener();
 }
 
+// ─── NEW: SEARCH LOGIC ───
+function setupSearchListener() {
+    const searchInput = document.getElementById('search-input'); // Ensure your HTML has this ID
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        
+        if (!query) {
+            renderCategories(allProductsData);
+            return;
+        }
+
+        // Filter data based on Title, Category, or Description
+        const filtered = allProductsData.filter(product => 
+            product.title?.toLowerCase().includes(query) ||
+            product.category?.toLowerCase().includes(query) ||
+            product.description?.toLowerCase().includes(query)
+        );
+
+        renderCategories(filtered);
+    });
+}
+
 function createProductHTML(product) {
-    // Accessing the image_urls array from your schema
     const firstImage = (product.image_urls && product.image_urls.length > 0) 
         ? product.image_urls[0] 
-        : 'https://via.placeholder.com/400';
+        : 'https://ui-avatars.com/api/?name=Fix+Kar&background=ef4444&color=fff';
 
-    // Show title, price, category, condition, and description
     return `
         <div class="group relative bg-white p-4 rounded-2xl shadow-sm border border-gray-100 transition-all hover:shadow-lg hover:border-red-200">
             <div class="aspect-square w-full overflow-hidden rounded-xl bg-gray-50">
@@ -65,27 +89,34 @@ function renderCategories(data) {
 
     const displayedIds = new Set();
 
-    // Loop through categories and show ALL products (no slicing)
     Object.entries(categoriesMapping).forEach(([name, gridId]) => {
         const gridElement = document.getElementById(gridId);
         if (!gridElement) return;
 
-        // Filter by the exact category string in your DB
         const filtered = data.filter(p => p.category === name);
         
+        // Hide the section if no results found in this category during search
+        const section = gridElement.closest('section'); 
+        if (section) {
+            section.style.display = filtered.length === 0 ? 'none' : 'block';
+        }
+
         gridElement.innerHTML = filtered.map(product => {
             displayedIds.add(product.id);
             return createProductHTML(product);
         }).join('');
     });
 
-    // Handle products that don't match the standard 4 categories
     const otherGrid = document.getElementById('grid-others');
-    if (otherGrid) {
+    const othersSection = document.getElementById('others-section');
+    if (otherGrid && othersSection) {
         const others = data.filter(p => !displayedIds.has(p.id));
         if (others.length > 0) {
-            document.getElementById('others-section').classList.remove('hidden');
+            othersSection.classList.remove('hidden');
+            othersSection.style.display = 'block';
             otherGrid.innerHTML = others.map(product => createProductHTML(product)).join('');
+        } else {
+            othersSection.style.display = 'none';
         }
     }
 }
