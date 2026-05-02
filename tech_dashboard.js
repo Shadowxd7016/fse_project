@@ -58,34 +58,140 @@ async function initDashboard() {
 }
 async function loadProducts() {
     const productList = document.getElementById('product-list');
+    const pendingCountLabel = document.querySelector('h3.text-5xl.font-black'); // Target for total jobs
     if (!productList) return;
 
-    const { data: products, error } = await db
-        .from('products')
-        .select('*');
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) return;
+
+    // Fetch orders + product details
+    const { data: orders, error } = await db
+        .from('repair_orders')
+        .select(`
+            *,
+            products (*) 
+        `)
+        .eq('technician_id', user.id)
+        .order('created_at', { ascending: false });
 
     if (error) {
-        productList.innerHTML = `<p class="text-red-500">Error loading products.</p>`;
+        productList.innerHTML = `<p class="text-red-500 text-center">Error loading data.</p>`;
         return;
     }
 
-    if (!products || products.length === 0) {
-        productList.innerHTML = `<p class="text-gray-500 text-center col-span-full">No items in shop yet.</p>`;
+    // UPDATE TOTAL PENDING JOBS COUNTER
+    // Logic: Jobs that are NOT yet delivered are considered pending
+    if (pendingCountLabel) {
+        const pendingJobs = orders.filter(o => !o.is_delivered).length;
+        pendingCountLabel.innerText = pendingJobs;
+    }
+
+    if (!orders || orders.length === 0) {
+        productList.innerHTML = `<p class="text-gray-400 text-center py-10">No repair jobs assigned.</p>`;
         return;
     }
 
-    productList.innerHTML = products.map(item => `
-        <div class="product-card fixkar-card p-4">
-            <img src="${item.image_url || 'https://via.placeholder.com/300'}" class="w-full h-48 object-cover rounded-xl border-2 border-black mb-4">
-            <h3 class="font-bold text-gray-800 text-lg">${item.name}</h3>
-            <p class="text-red-600 font-black mt-1">$${item.price}</p>
-            <button class="w-full mt-4 bg-black text-white py-2 rounded-xl font-bold hover:bg-gray-800 transition">
-                View Details
-            </button>
-        </div>
-    `).join('');
+    productList.innerHTML = orders.map(order => {
+        const item = order.products;
+        
+        // Sequential Logic
+        const nextStep = !order.is_received ? 'is_received' 
+                       : !order.is_working ? 'is_working' 
+                       : !order.is_completed ? 'is_completed' 
+                       : !order.is_delivered ? 'is_delivered' : null;
+
+        const buttonLabel = {
+            'is_received': 'Confirm Receipt',
+            'is_working': 'Start Repair',
+            'is_completed': 'Repair Finished',
+            'is_delivered': 'Handover to Customer'
+        }[nextStep] || 'Completed';
+
+        return `
+            <div class="card-modern flex flex-col md:flex-row gap-8 mb-6 hover:border-red-500 transition-all group">
+                <div class="w-full md:w-64 h-64 flex-shrink-0">
+                    <img src="${item.image_urls ? item.image_urls[0] : 'https://via.placeholder.com/300'}" 
+                         class="w-full h-full object-cover rounded-2xl shadow-sm">
+                </div>
+
+                <div class="flex-1 flex flex-col">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-[10px] font-extrabold text-red-500 uppercase tracking-widest">${item.category || 'Product'}</span>
+                            <h3 class="text-2xl font-extrabold text-slate-900 mt-1">${item.title}</h3>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xl font-black text-slate-900">Rs. ${item.price}</p>
+                            <span class="text-xs font-bold text-gray-400 uppercase">Condition: ${item.condition}</span>
+                        </div>
+                    </div>
+
+                    <p class="text-gray-500 text-sm mt-4 leading-relaxed line-clamp-3">
+                        ${item.description || 'No description provided for this item.'}
+                    </p>
+
+                    <div class="mt-auto pt-6">
+                        <div class="flex items-center justify-between mb-4 px-2">
+                            <div class="flex flex-col items-center gap-2">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${order.is_received ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-400'}">1</div>
+                                <span class="text-[9px] font-bold uppercase tracking-tighter">Received</span>
+                            </div>
+                            <div class="h-[2px] flex-1 bg-gray-100 mx-2 mb-4">
+                                <div class="h-full bg-green-500 transition-all duration-500" style="width: ${order.is_working ? '100%' : '0%'}"></div>
+                            </div>
+                            <div class="flex flex-col items-center gap-2">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${order.is_working ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-400'}">2</div>
+                                <span class="text-[9px] font-bold uppercase tracking-tighter">Working</span>
+                            </div>
+                            <div class="h-[2px] flex-1 bg-gray-100 mx-2 mb-4">
+                                <div class="h-full bg-green-500 transition-all duration-500" style="width: ${order.is_completed ? '100%' : '0%'}"></div>
+                            </div>
+                            <div class="flex flex-col items-center gap-2">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${order.is_completed ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-400'}">3</div>
+                                <span class="text-[9px] font-bold uppercase tracking-tighter">Fixed</span>
+                            </div>
+                            <div class="h-[2px] flex-1 bg-gray-100 mx-2 mb-4">
+                                <div class="h-full bg-green-500 transition-all duration-500" style="width: ${order.is_delivered ? '100%' : '0%'}"></div>
+                            </div>
+                            <div class="flex flex-col items-center gap-2">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${order.is_delivered ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-400'}">4</div>
+                                <span class="text-[9px] font-bold uppercase tracking-tighter">Delivered</span>
+                            </div>
+                        </div>
+
+                        <button 
+                            onclick="updateJobStatus('${order.id}', '${nextStep}')"
+                            ${!nextStep ? 'disabled' : ''}
+                            class="w-full ${!nextStep ? 'bg-gray-100 text-gray-400' : 'bg-slate-900 hover:bg-red-500 text-white'} py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2">
+                            ${!nextStep ? '<i class="fa fa-check-circle"></i> Completed' : buttonLabel + ' <i class="fa fa-arrow-right text-xs"></i>'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
+async function updateJobStatus(orderId, columnToUpdate) {
+    if (!columnToUpdate) return;
 
+    try {
+        const updateData = {};
+        updateData[columnToUpdate] = true;
+
+        const { error } = await db
+            .from('repair_orders')
+            .update(updateData)
+            .eq('id', orderId);
+
+        if (error) throw error;
+
+        // Refresh the list to show updated status and buttons
+        loadProducts();
+        
+    } catch (err) {
+        alert("Update failed: " + err.message);
+    }
+}
 // FIXED: Added 'async' so 'await' works
 async function logout() {
     await db.auth.signOut();

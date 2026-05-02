@@ -21,6 +21,47 @@
         .auth-btn:hover {
             transform: scale(1.1);
         }
+        /* Product Card Styling */
+.product-card {
+    background: white;
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid #f1f1f1;
+    transition: all 0.3s ease;
+    position: relative;
+    cursor: pointer;
+}
+
+.product-card:hover {
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    transform: translateY(-4px);
+    border-color: #ef4444; /* FixKar Red */
+}
+
+.product-image-container {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 8px;
+    background-color: #f9fafb;
+}
+
+.product-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.product-card:hover img {
+    transform: scale(1.05);
+}
+
+.price-tag {
+    color: #ef4444;
+    font-weight: 800;
+    font-size: 1.1rem;
+}
     </style>
 </head>
 
@@ -39,6 +80,7 @@
             <button id="auth-btn">Sign Up</button>
         </div>
     </nav>
+    <div id="navbar-placeholder"></div>
     <section class="bg-gray-900 text-white py-24 px-4">
         <div class="max-w-4xl mx-auto text-center">
             <h1 class="text-4xl md:text-6xl font-bold mb-6 italic">Buy Smart. <span class="text-red-500">Sell Fast.</span></h1>
@@ -52,33 +94,38 @@
         </div>
     </section>
 
-    <div id="search-results-section" class="hidden mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <h2 id="search-title" class="text-2xl font-bold tracking-tight text-gray-900">Search Results</h2>
-        <div id="search-grid" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4"></div>
-    </div>
+   <div id="search-results-section" class="hidden mx-auto max-w-7xl px-4 py-16">
+    <h2 class="text-2xl font-bold tracking-tight text-gray-900">Search Results</h2>
+    <div id="search-grid" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4"></div>
+</div>
 
-    <div id="all-categories" class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <h2 class="text-2xl font-bold tracking-tight text-gray-900 flex items-center">
-            <span class="material-symbols-outlined mr-2">smartphone</span> Mobile Phones
-        </h2>
-        <div id="grid-mobile" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 mb-16"></div>
+<div id="all-categories" class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+    <h2 class="text-2xl font-bold tracking-tight text-gray-900 flex items-center">
+        <span class="material-symbols-outlined mr-2">smartphone</span> Mobile Phones
+    </h2>
+    <div id="grid-mobile" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 mb-16"></div>
 
-        <h2 class="text-2xl font-bold tracking-tight text-gray-900 flex items-center">
-            <span class="material-symbols-outlined mr-2">laptop_mac</span> Laptops
-        </h2>
-        <div id="grid-laptop" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 mb-16"></div>
+    <h2 class="text-2xl font-bold tracking-tight text-gray-900 flex items-center">
+        <span class="material-symbols-outlined mr-2">laptop_mac</span> Laptops
+    </h2>
+    <div id="grid-laptop" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 mb-16"></div>
 
-        <h2 class="text-2xl font-bold tracking-tight text-gray-900 flex items-center">
-            <span class="material-symbols-outlined mr-2">tablet_android</span> Tablets
-        </h2>
-        <div id="grid-tablet" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 mb-16"></div>
+    <h2 class="text-2xl font-bold tracking-tight text-gray-900 flex items-center">
+        <span class="material-symbols-outlined mr-2">tablet_android</span> Tablets
+    </h2>
+    <div id="grid-tablet" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 mb-16"></div>
 
-        <h2 class="text-2xl font-bold tracking-tight text-gray-900 flex items-center">
-            <span class="material-symbols-outlined mr-2">photo_camera</span> Cameras
-        </h2>
-        <div id="grid-camera" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4"></div>
-    </div>
-
+    <h2 class="text-2xl font-bold tracking-tight text-gray-900 flex items-center">
+        <span class="material-symbols-outlined mr-2">photo_camera</span> Cameras
+    </h2>
+    <div id="grid-camera" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4"></div>
+</div>
+<div id="others-section" class="hidden mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 border-t border-gray-100">
+    <h2 class="text-2xl font-bold tracking-tight text-gray-900 flex items-center">
+        <span class="material-symbols-outlined mr-2">explore</span> More for You
+    </h2>
+    <div id="grid-others" class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4"></div>
+</div>
     <footer id="footer" class="bg-white border-t border-gray-200 pt-16 pb-8">
         <div class="max-w-7xl mx-auto px-4 text-center">
             <h2 class="text-xl font-bold italic mb-4">Fix<span class="text-red-600">Kar</span></h2>

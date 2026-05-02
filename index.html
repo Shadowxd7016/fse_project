@@ -9,294 +9,342 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="style.css">
     <style>
-        body { background-color: #ffffff; font-family: sans-serif; scroll-behavior: smooth; }
-        .card-shadow { box-shadow: 8px 8px 0px 0px rgba(0,0,0,1); border: 2px solid black; border-radius: 2rem; }
-        .input-field { border: 1.5px solid black; border-radius: 0.75rem; padding: 0.5rem 1rem; width: 100%; outline: none; }
-        .btn-black { background: black; color: white; border-radius: 9999px; padding: 0.6rem 2rem; font-weight: 600; transition: transform 0.1s; }
-        .btn-black:active { transform: scale(0.95); }
-        .action-btn { transition: all 0.2s; cursor: pointer; }
-        .action-btn:hover { transform: scale(1.2); }
+        :root {
+            --red: #ef4444;
+            --dark: #0f172a;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --border: #e5e7eb;
+        }
 
-        /* ── Notification Bell ─────────────────────────────────────── */
-        #notif-wrapper { position: relative; }
+        body {
+            background-color: var(--gray-50);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--dark);
+            scroll-behavior: smooth;
+        }
 
+        .card-modern {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+        }
+
+        .input-field {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            outline: none;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+        .input-field:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(239,68,68,0.08); }
+
+        .btn-red {
+            background: var(--red);
+            color: white;
+            border-radius: 12px;
+            padding: 0.8rem 2rem;
+            font-weight: 700;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-red:hover { background: #dc2626; transform: translateY(-1px); }
+        .btn-red:active { transform: translateY(0); }
+
+        .btn-outline {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            transition: 0.2s;
+            background: transparent;
+            cursor: pointer;
+        }
+        .btn-outline:hover { border-color: var(--red); color: var(--red); }
+
+        /* ── Notification Bell ── */
         #notif-btn {
             position: relative;
-            width: 36px; height: 36px;
+            width: 42px; height: 42px;
             display: flex; align-items: center; justify-content: center;
-            border-radius: 50%;
-            border: 1.5px solid black;
-            background: white;
-            cursor: pointer;
-            transition: background 0.15s;
+            border-radius: 12px;
+            background: var(--gray-100);
+            cursor: pointer; transition: 0.2s;
+            border: none;
         }
-        #notif-btn:hover { background: #f3f4f6; }
+        #notif-btn:hover { background: var(--border); }
 
+        /* FIX: badge hidden by default — shown via JS when conversations exist */
         #notif-badge {
-            position: absolute;
-            top: -4px; right: -4px;
-            background: #ef4444;
-            color: white;
-            font-size: 9px;
-            font-weight: 700;
-            min-width: 16px; height: 16px;
-            border-radius: 999px;
-            display: none;
+            position: absolute; top: -5px; right: -5px;
+            background: var(--red); color: white;
+            font-size: 10px; font-weight: 800;
+            min-width: 18px; height: 18px;
+            border-radius: 50%;
+            display: none;              /* hidden until conversations load */
             align-items: center; justify-content: center;
-            padding: 0 3px;
             border: 2px solid white;
         }
 
         #notif-panel {
             display: none;
-            position: absolute;
-            top: calc(100% + 10px);
-            right: 0;
-            width: 320px;
-            background: white;
-            border: 2px solid black;
-            border-radius: 1.25rem;
-            box-shadow: 6px 6px 0px 0px rgba(0,0,0,1);
-            z-index: 999;
-            overflow: hidden;
-            animation: popIn 0.18s cubic-bezier(.34,1.56,.64,1);
-        }
-        @keyframes popIn {
-            from { opacity: 0; transform: scale(0.92) translateY(-6px); }
-            to   { opacity: 1; transform: scale(1) translateY(0); }
+            position: absolute; top: 60px; right: 0;
+            width: 340px; background: white; border-radius: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.12);
+            border: 1px solid var(--border); z-index: 100; overflow: hidden;
         }
         #notif-panel.open { display: block; }
 
-        .notif-header {
-            padding: 12px 16px 10px;
-            border-bottom: 1.5px solid black;
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        .notif-header span { font-weight: 700; font-size: 13px; }
-
-        .notif-list { max-height: 340px; overflow-y: auto; }
-        .notif-list::-webkit-scrollbar { width: 4px; }
-        .notif-list::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
-
+        /* ── Notification item styles (were missing entirely) ── */
         .notif-item {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 10px;
-            padding: 11px 14px;
-            border-bottom: 1px solid #f0f0f0;
-            cursor: pointer;
-            transition: background 0.12s;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
             text-decoration: none;
             color: inherit;
+            transition: background 0.15s;
+            cursor: pointer;
         }
         .notif-item:last-child { border-bottom: none; }
-        .notif-item:hover { background: #f9fafb; }
+        .notif-item:hover { background: var(--gray-50); }
 
         .notif-avatar {
             width: 38px; height: 38px;
             border-radius: 50%;
-            border: 1.5px solid black;
-            flex-shrink: 0;
-            background: #e5e7eb;
+            background: var(--gray-100);
             display: flex; align-items: center; justify-content: center;
-            font-size: 15px; color: #6b7280;
-            overflow: hidden;
+            flex-shrink: 0; overflow: hidden;
+            font-size: 14px; color: #9ca3af;
         }
         .notif-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
         .notif-body { flex: 1; min-width: 0; }
-        .notif-name     { font-weight: 700; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .notif-product  { font-size: 11px; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .notif-last-msg { font-size: 11px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+        .notif-name {
+            font-size: 13px; font-weight: 700; color: var(--dark);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .notif-product {
+            font-size: 11px; color: #6b7280; margin-top: 1px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .notif-last-msg {
+            font-size: 11px; color: #9ca3af; margin-top: 2px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
 
         .notif-tag {
-            font-size: 9px; font-weight: 800; text-transform: uppercase;
-            padding: 2px 7px; border-radius: 999px; flex-shrink: 0;
-            letter-spacing: 0.04em;
+            font-size: 9px; font-weight: 800;
+            padding: 2px 7px; border-radius: 99px;
+            text-transform: uppercase; letter-spacing: 0.04em;
+            flex-shrink: 0; align-self: center;
         }
-        .tag-buyer  { background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
-        .tag-seller { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+        .tag-buyer  { background: #dbeafe; color: #1d4ed8; }
+        .tag-seller { background: #fce7f3; color: #be185d; }
 
         .notif-empty {
-            padding: 32px 16px;
-            text-align: center;
-            font-size: 12px;
-            color: #9ca3af;
+            display: flex; align-items: center; justify-content: center;
+            gap: 8px; padding: 32px 16px;
+            font-size: 12px; color: #9ca3af;
         }
-        .notif-empty i { font-size: 28px; display: block; margin-bottom: 8px; color: #d1d5db; }
-        .technician-mini-bar {
-            background: #f9f9f9;
-            padding: 30px 20px;
-            border: 1px solid #eee;
+
+        /* ── Ad Cards ── */
+        .ad-mini-card {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 12px;
+            transition: 0.2s;
+        }
+        .ad-mini-card:hover { border-color: var(--red); background: var(--gray-50); }
+
+        /* ── Dashboard Promo ── */
+        .promo-gradient {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+        }
+
+        /* ── Image Preview ── */
+        #image-preview-container img {
+            width: 80px; height: 80px;
+            object-fit: cover;
             border-radius: 12px;
-            margin: 20px auto;
-            max-width: 900px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        .mini-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 20px;
+        /* ── Boost Modal ── */
+        #boostModal {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+            align-items: center; justify-content: center;
         }
-
-        .mini-text h3 {
-            margin: 0 0 5px 0;
-            font-size: 1.25rem;
-            color: #111;
-        }
-
-        .mini-text p {
-            margin: 0;
-            color: #666;
-            font-size: 0.95rem;
-        }
-
-        .mini-btn {
-            background: #000; /* Classic white-label black */
-            color: #fff;
-            padding: 12px 24px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            white-space: nowrap;
-        }
-
-        @media (max-width: 600px) {
-            .mini-container { flex-direction: column; text-align: center; }
-        }
+        #boostModal.open { display: flex; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <header class="mx-auto flex justify-between items-center mb-12" style="border-color: black; border-width: 0.8px; border-radius: 0.1rem; padding: 0.5rem 2rem; min-height: 80px;">
-    <div class="flex items-center">
-        <img src="Picture1.png" alt="logo" class="w-40 h-auto object-contain">
-    </div>
+    <!-- ═══════════════════════ HEADER ═══════════════════════ -->
+    <header class="max-w-7xl mx-auto flex justify-between items-center mb-10 bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
+        <div class="flex items-center px-4">
+            <h2 class="text-2xl font-extrabold italic tracking-tighter cursor-pointer" onclick="window.location.href='home.html'">
+                Fix<span class="text-red-500">Kar</span>
+            </h2>
+        </div>
 
-    <div class="flex items-center space-x-8">
-        <nav class="hidden md:flex items-center space-x-6 font-medium">
-            <a href="home.html" class="hover:text-blue-600 transition">Home</a>
-            <a href="About us.html" class="hover:text-blue-600 transition">About Us</a>
-            <a href="Contact us.html" class="hover:text-blue-600 transition">Contact Us</a>
-            
-            <div id="notif-wrapper" class="relative flex items-center">
-                <button id="notif-btn" onclick="toggleNotifPanel()" title="Conversations" class="focus:outline-none flex items-center">
-                    <i class="fas fa-bell text-sm"></i>
-                    <span id="notif-badge" class="ml-1 bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded-full">0</span>
-                </button>
-                
-                <div id="notif-panel" class="absolute right-0 mt-2 top-full">
-                    <div class="notif-header">
-                        <span>💬 Conversations</span>
-                        <span id="notif-count-label" class="text-xs text-gray-400 font-normal"></span>
-                    </div>
-                    <div id="notif-list" class="notif-list">
-                        <div class="notif-empty"><i class="fas fa-comment-slash"></i> Loading...</div>
+        <div class="flex items-center space-x-6">
+            <nav class="hidden md:flex items-center space-x-8 font-semibold text-sm text-gray-500">
+                <a href="home.html" class="hover:text-red-500 transition">Home</a>
+                <a href="About us.html" class="hover:text-red-500 transition">About Us</a>
+                <a href="Contact us.html" class="hover:text-red-500 transition">Contact Us</a>
+
+                <div id="notif-wrapper" class="relative">
+                    <button id="notif-btn" onclick="toggleNotifPanel()">
+                        <i class="fa-solid fa-message text-gray-600"></i>
+                        <span id="notif-badge">0</span>
+                    </button>
+
+                    <div id="notif-panel">
+                        <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+                            <span class="font-bold text-sm">Conversations</span>
+                            <!-- FIX: added notif-count-label element that JS references -->
+                            <span id="notif-count-label" class="text-xs text-gray-400"></span>
+                        </div>
+                        <div id="notif-list" class="max-h-80 overflow-y-auto">
+                            <div class="notif-empty">No conversations yet</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </nav>
+            </nav>
 
-        <button id="auth-btn" class="bg-black text-white px-6 py-2 rounded-xl font-bold hover:bg-gray-800 transition text-sm" onclick="handleLogout()">
-            Logout
-        </button>
-    </div>
-</header>
+            <button class="bg-black text-white px-6 py-2.5 rounded-xl font-bold hover:bg-red-500 transition text-sm" onclick="handleLogout()">
+                Logout
+            </button>
+        </div>
+    </header>
 
-    <main class="mx-auto space-y-10">
-        <section id="apply-tech" style="display: none;" class="card-shadow p-8 bg-white">
-            <div class="mini-container">
-                <div class="mini-text">
-                    <h3>Ready to lead? <strong>Become a Technician.</strong></h3>
-                    <p>Set your own schedule and earn more with our professional network.</p>
+    <!-- ═══════════════════════ MAIN ═══════════════════════ -->
+    <main class="max-w-5xl mx-auto space-y-8">
+
+        <!-- Technician CTA (non-tech users) -->
+        <section id="apply-tech" style="display:none;" class="card-modern bg-white">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div>
+                    <h3 class="text-xl font-bold">Ready to lead? <span class="text-red-500">Become a Technician.</span></h3>
+                    <p class="text-gray-500 text-sm">Set your own schedule and earn more with our professional network.</p>
                 </div>
-                <a href="apply.html" class="mini-btn">Get Started</a>
+                <a href="apply.html" class="btn-red text-center min-w-[160px]">Get Started</a>
             </div>
         </section>
 
-        <section id="tech-promo" style="display: none;" class="card-shadow p-8 bg-white">
-            <div class="mini-container">
-                <div class="mini-text">
-                    <h3 class="italic">Ready to join the crew? <strong>Access your Portal.</strong></h3>
-                    <p>Elevate your status and manage your professional technician dashboard.</p>
+        <!-- Technician Portal (tech users) -->
+        <section id="tech-promo" style="display:none;" class="card-modern promo-gradient">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div>
+                    <h3 class="text-xl font-bold italic">Technician <span class="text-red-500">Portal</span></h3>
+                    <p class="text-gray-300 text-sm">Manage your professional service requests and dashboard.</p>
                 </div>
-                <a href="tech_dashboard.html" class="mt-6 md:mt-0 bg-black text-white px-8 py-3 rounded-xl font-bold text-center hover:bg-red-600 transition transform hover:scale-105 shadow-[4px_4px_0px_0px_rgba(220,38,38,1)]">
-                    Go to Dashboard
+                <a href="tech_dashboard.html"
+                    class="inline-flex items-center gap-3 bg-white text-[#0f172a] px-8 py-3.5 rounded-2xl font-extrabold transition-all duration-300 hover:bg-[#ef4444] hover:text-white hover:-translate-y-1 hover:shadow-[0_20px_40px_-10px_rgba(239,68,68,0.4)] shadow-lg shadow-black/20">
+                    <span>Go to Dashboard</span>
+                    <i class="fa-solid fa-arrow-right text-sm"></i>
                 </a>
             </div>
         </section>
-        <section class="card-shadow p-8 bg-white">
-          <h2 class="text-xl font-bold mb-6 flex items-center">
-              <i class="far fa-user mr-3"></i> Update Profile
-          </h2>
-          <div class="flex flex-col md:flex-row gap-8">
-              <div class="flex flex-col items-center space-y-4">
-                  <div class="w-32 h-32 bg-gray-100 rounded-full border-2 border-black flex items-center justify-center overflow-hidden">
-                      <img id="profile-img-display" src="" class="hidden w-full h-full object-cover">
-                      <i id="profile-icon-placeholder" class="fas fa-user text-5xl text-gray-400"></i>
-                  </div>
-                  <input type="file" id="avatar-file" accept="image/*" class="hidden" onchange="previewImage(this)">
-                  <button onclick="document.getElementById('avatar-file').click()" class="border border-black rounded-full px-4 py-1 text-xs font-bold uppercase hover:bg-black hover:text-white transition-colors">
-                      Select Photo
-                  </button>
-              </div>
-              <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                      <label class="text-[10px] font-bold uppercase ml-1">First Name</label>
-                      <input type="text" id="profile-fname" placeholder="First Name" class="input-field text-sm">
-                  </div>
-                  <div>
-                      <label class="text-[10px] font-bold uppercase ml-1">Last Name</label>
-                      <input type="text" id="profile-lname" placeholder="Last Name" class="input-field text-sm">
-                  </div>
-                  <div>
-                      <label class="text-[10px] font-bold uppercase ml-1">Email Address</label>
-                      <input type="email" id="profile-email" placeholder="Email" class="input-field text-sm bg-gray-50" disabled>
-                  </div>
-                  <div>
-                      <label class="text-[10px] font-bold uppercase ml-1">Phone number</label>
-                      <input type="text" id="profile-contact" placeholder="Number" class="input-field text-sm bg-gray-50">
-                  </div>
-                  <div class="md:col-span-2">
-                      <label class="text-[10px] font-bold uppercase ml-1">New Password</label>
-                      <input type="password" id="profile-password" placeholder="Leave blank to keep current" class="input-field text-sm">
-                  </div>
-              </div>
-          </div>
-          <div class="flex justify-end mt-6">
-              <button id="save-profile-btn" onclick="updateFullProfile()" class="btn-black text-sm">Save Changes</button>
-          </div>
-        </section>
 
-        <section class="card-shadow p-8 bg-white relative">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold flex items-center"><i class="fas fa-list-ul mr-3"></i> My Ads</h2>
-                <span id="ad-count" class="bg-black text-white text-[10px] px-3 py-1 rounded-full font-bold">0 ADS</span>
-            </div>
-            <div id="my-ads-container" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <p class="text-gray-400 text-sm italic col-span-full">Loading your ads...</p>
-            </div>
-        </section>
-
-        <section id="upload-section" class="card-shadow p-8 bg-white">
-            <h2 id="form-title" class="text-xl font-bold mb-6 flex items-center">
-                <i class="fas fa-upload mr-3"></i> Upload Ad
+        <!-- Update Profile -->
+        <section class="card-modern">
+            <h2 class="text-xl font-bold mb-8 flex items-center">
+                <span class="w-2 h-6 bg-red-500 rounded-full mr-3"></span> Update Profile
             </h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                <div class="col-span-2">
-                    <label class="text-[10px] font-bold uppercase ml-1">Title</label>
-                    <input type="text" id="ad-title" placeholder="e.g. Wooden Chair" class="input-field text-sm">
+            <div class="flex flex-col md:flex-row gap-10">
+                <div class="flex flex-col items-center space-y-4">
+                    <div class="relative group">
+                        <div class="w-32 h-32 bg-gray-100 rounded-2xl border border-gray-200 flex items-center justify-center overflow-hidden shadow-inner">
+                            <img id="profile-img-display" src="" class="hidden w-full h-full object-cover">
+                            <i id="profile-icon-placeholder" class="fas fa-user text-4xl text-gray-300"></i>
+                        </div>
+                        <button onclick="document.getElementById('avatar-file').click()" class="absolute -bottom-2 -right-2 bg-white border border-gray-200 p-2 rounded-lg shadow-md hover:text-red-500">
+                            <i class="fas fa-camera text-sm"></i>
+                        </button>
+                    </div>
+                    <input type="file" id="avatar-file" accept="image/*" class="hidden" onchange="previewImage(this)">
                 </div>
-                <div>
-                    <label class="text-[10px] font-bold uppercase ml-1">Price (RS)</label>
-                    <input type="number" id="ad-price" placeholder="1000" class="input-field text-sm">
+
+                <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-1">
+                        <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">First Name</label>
+                        <input type="text" id="profile-fname" class="input-field">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Last Name</label>
+                        <input type="text" id="profile-lname" class="input-field">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Email (Fixed)</label>
+                        <input type="email" id="profile-email" class="input-field bg-gray-50 text-gray-400" disabled>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Contact Number</label>
+                        <input type="text" id="profile-contact" class="input-field">
+                    </div>
+                    <div class="md:col-span-2 space-y-1">
+                        <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Update Password</label>
+                        <input type="password" id="profile-password" placeholder="••••••••" class="input-field">
+                    </div>
                 </div>
-                <div>
-                    <label class="text-[10px] font-bold uppercase ml-1">Condition</label>
-                    <select id="ad-condition" class="input-field text-sm bg-white">
-                        <option value="">Select Condition</option>
+            </div>
+            <div class="flex justify-end mt-10">
+                <button id="save-profile-btn" onclick="updateFullProfile()" class="btn-red">Save Changes</button>
+            </div>
+        </section>
+
+        <!-- My Ads -->
+        <section class="card-modern">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-xl font-bold flex items-center">
+                    <span class="w-2 h-6 bg-red-500 rounded-full mr-3"></span> My Ads
+                </h2>
+                <span id="ad-count" class="bg-gray-100 text-gray-600 text-[10px] px-4 py-1.5 rounded-full font-bold uppercase tracking-widest">0 Ads</span>
+            </div>
+            <div id="my-ads-container" class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <p class="text-gray-400 text-sm italic col-span-full py-10 text-center">Fetching your listings...</p>
+            </div>
+        </section>
+
+        <!-- Create / Edit Ad -->
+        <section id="upload-section" class="card-modern">
+            <div class="flex justify-between items-center mb-8">
+                <h2 id="form-title" class="text-xl font-bold flex items-center">
+                    <span class="w-2 h-6 bg-red-500 rounded-full mr-3"></span>
+                    <span>Create New Ad</span>
+                </h2>
+                <button id="reset-btn" onclick="resetForm()" class="hidden text-xs font-bold uppercase text-red-500 hover:underline">
+                    Cancel Edit
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                <div class="md:col-span-2 space-y-1">
+                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Product Title</label>
+                    <input type="text" id="ad-title" placeholder="e.g. Sony WH-1000XM4" class="input-field">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Price (PKR)</label>
+                    <input type="number" id="ad-price" placeholder="45000" class="input-field">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Condition</label>
+                    <select id="ad-condition" class="input-field bg-white">
+                        <option value="">Select</option>
                         <option value="Damaged">Damaged (For Parts)</option>
                         <option value="Used">Used</option>
                         <option value="Refurbished">Refurbished</option>
@@ -304,11 +352,12 @@
                     </select>
                 </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label class="text-[10px] font-bold uppercase ml-1">Category</label>
-                    <select id="ad-category" class="input-field text-sm bg-white">
-                        <option value="">Select Category</option>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="space-y-1">
+                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Category</label>
+                    <select id="ad-category" class="input-field bg-white">
+                        <option value="">Choose Category</option>
                         <option value="Furniture">Furniture</option>
                         <option value="Electronics">Electronics & Mobiles</option>
                         <option value="Appliances">Home Appliances</option>
@@ -319,71 +368,49 @@
                         <option value="Eco-Friendly">Eco-Friendly Products</option>
                     </select>
                 </div>
-                <div>
-                    <label class="text-[10px] font-bold uppercase ml-1">Upload Pictures</label>
-                    <label for="ad-images" class="input-field text-sm bg-gray-50 flex items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors border-dashed">
-                        <i class="fas fa-camera mr-2"></i> Choose Images
+                <div class="space-y-1">
+                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Product Images</label>
+                    <label for="ad-images" class="input-field bg-gray-50 flex items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors border-dashed border-2 border-gray-200 h-[46px]">
+                        <i class="fas fa-camera mr-2 text-gray-400 text-sm"></i>
+                        <span class="text-sm font-semibold text-gray-600">Choose Files</span>
                         <input type="file" id="ad-images" multiple accept="image/*" class="hidden" onchange="previewImages()">
                     </label>
                 </div>
             </div>
-            <div id="image-preview-container" class="flex flex-wrap gap-2 mb-4"></div>
-            <div class="mb-6">
-                <label class="text-[10px] font-bold uppercase ml-1">Description</label>
-                <textarea id="ad-desc" rows="4" placeholder="Describe your item..." class="input-field text-sm"></textarea>
+
+            <div id="image-preview-container" class="flex flex-wrap gap-3 mb-6"></div>
+
+            <div class="mb-8 space-y-1">
+                <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Detailed Description</label>
+                <textarea id="ad-desc" rows="4" placeholder="Tell buyers about the condition, features, and why you are selling..." class="input-field"></textarea>
             </div>
-            <div class="flex justify-between items-center">
-                <button id="reset-btn" onclick="resetForm()" class="hidden text-xs font-bold uppercase underline text-gray-500 hover:text-black">Cancel Edit</button>
-                <button id="submit-btn" onclick="handlePublishAd()" class="btn-black text-sm flex items-center ml-auto">
-                    Publish Ad <i class="fas fa-paper-plane ml-2 text-xs"></i>
+
+            <div class="flex justify-end">
+                <button id="submit-btn" onclick="handlePublishAd()" class="btn-red flex items-center gap-2 group">
+                    <span>Publish Ad</span>
+                    <i class="fas fa-paper-plane text-xs transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"></i>
                 </button>
             </div>
         </section>
 
-        <div id="boostModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
-            <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
-                <div class="bg-blue-600 p-6 text-white">
-                    <h3 class="text-xl font-bold">Boost Your Listing (RS.200/ad)</h3>
-                    <p class="text-blue-100 text-sm">Enter payment details to go featured</p>
-                </div>
-
-        <div id="boostModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
-            <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
-                <div class="bg-blue-600 p-6 text-white">
-                    <h3 class="text-xl font-bold">Boost Your Listing (RS.200/ad)</h3>
-                    <p class="text-blue-100 text-sm">Enter payment details to go featured</p>
-                </div>
-                <div class="p-6 space-y-4">
-                    <input type="hidden" id="targetAdId">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Card Number</label>
-                        <div class="relative">
-                            <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19"
-                                class="w-full border-b-2 border-gray-200 focus:border-blue-500 outline-none py-2 tracking-widest">
-                            <i class="fas fa-credit-card absolute right-2 top-3 text-gray-400"></i>
-                        </div>
-                    </div>
-                    <div class="flex gap-6">
-                        <div class="flex-1">
-                            <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Expiry (MM/YY)</label>
-                            <input type="text" id="expiry" placeholder="12/26" maxlength="5"
-                                class="w-full border-b-2 border-gray-200 focus:border-blue-500 outline-none py-2">
-                        </div>
-                        <div class="flex-1">
-                            <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">CVV</label>
-                            <input type="password" id="cvv" placeholder="***" maxlength="3"
-                                class="w-full border-b-2 border-gray-200 focus:border-blue-500 outline-none py-2">
-                        </div>
-                    </div>
-                </div>
-                <div class="p-6 bg-gray-50 flex gap-3">
-                    <button onclick="closeBoostModal()" class="flex-1 px-4 py-2 text-gray-600 font-medium hover:text-gray-800 transition">Cancel</button>
-                    <button onclick="validateAndSubmit()" class="flex-1 px-4 py-2 bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:bg-blue-700 transition">Pay Now</button>
-                </div>
+        <!-- Repair Progress -->
+        <section class="card-modern mt-10">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-xl font-bold flex items-center">
+                    <span class="w-2 h-6 bg-red-500 rounded-full mr-3"></span>
+                    Repair Progress
+                </h2>
+                <span id="repair-count" class="bg-gray-100 text-gray-600 text-[10px] px-4 py-1.5 rounded-full font-bold uppercase tracking-widest">0 Items</span>
             </div>
-        </div>
+            <div id="seller-repair-list" class="grid grid-cols-1 gap-6">
+                <p class="text-gray-400 text-sm italic text-center py-10">Checking your repair updates...</p>
+            </div>
+        </section>
+
     </main>
 
+    <!-- ═══════════════════════ FOOTER ═══════════════════════ -->
+    <!-- FIX: footer moved inside body (was placed after </body>) -->
     <footer id="footer">
         <div class="footer-container">
             <div class="footer-section">
@@ -407,14 +434,69 @@
                 <a href="#">Contact Us</a>
             </div>
         </div>
-        <p class="footer-bottom">© 2026 MyMarket. All rights reserved.</p>
+        <p class="footer-bottom">© 2026 FixKar. All rights reserved.</p>
     </footer>
+
+    <!-- ═══════════════════════ BOOST MODAL ═══════════════════════ -->
+    <!-- FIX: modal HTML added — was referenced in JS but missing from the DOM entirely -->
+    <div id="boostModal">
+        <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-extrabold">Boost Your Ad 🚀</h3>
+                <button onclick="closeBoostModal()" class="text-gray-400 hover:text-red-500 text-xl leading-none">&times;</button>
+            </div>
+            <p class="text-sm text-gray-500 mb-6">Enter your payment details to promote this listing to the top.</p>
+            <input type="hidden" id="targetAdId">
+            <div class="space-y-4">
+                <div class="space-y-1">
+                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Card Number</label>
+                    <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19"
+                        class="input-field" oninput="formatCardNumber(this)">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Expiry (MM/YY)</label>
+                        <input type="text" id="expiry" placeholder="MM/YY" maxlength="5" class="input-field">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">CVV</label>
+                        <input type="password" id="cvv" placeholder="•••" maxlength="3" class="input-field">
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 flex gap-3">
+                <button onclick="closeBoostModal()" class="btn-outline flex-1">Cancel</button>
+                <button onclick="validateAndSubmit()" class="btn-red flex-1">Pay & Boost</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         const _supabase = supabase.createClient(
             'https://lvfbcbgmosfrpwvmrfhp.supabase.co',
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2ZmJjYmdtb3NmcnB3dm1yZmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0Mjc3MTEsImV4cCI6MjA4OTAwMzcxMX0.CMvOjwLs_1sDunNpphV5niv668Y459TwfzxDLioXx8c'
         );
+
+        // ════════════════════════════════════════════════════════════
+        //  INIT — single load handler, correct async sequencing
+        // ════════════════════════════════════════════════════════════
+        // FIX: replaced three competing load handlers (window.onload + two addEventListener)
+        // with one async init that awaits each step in order.
+        window.addEventListener('load', async function () {
+            const { data: { user } } = await _supabase.auth.getUser();
+            if (!user) {
+                window.location.href = 'registration.html';
+                return;
+            }
+
+            // Run profile load first (populates fields), then the rest in parallel
+            await loadProfile(user);
+            await Promise.all([
+                handleUserViewToggle(),   // FIX: now properly awaited
+                fetchMyAds(),
+                loadSellerRepairs()
+            ]);
+        });
 
         // ════════════════════════════════════════════════════════════
         //  NOTIFICATION BELL
@@ -431,7 +513,7 @@
             }
         }
 
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (notifPanelOpen && !document.getElementById('notif-wrapper').contains(e.target)) {
                 notifPanelOpen = false;
                 document.getElementById('notif-panel').classList.remove('open');
@@ -441,14 +523,13 @@
         async function loadConversations() {
             const list  = document.getElementById('notif-list');
             const badge = document.getElementById('notif-badge');
-            const label = document.getElementById('notif-count-label');
+            const label = document.getElementById('notif-count-label'); // FIX: element now exists in HTML
 
-            list.innerHTML = `<div class="notif-empty"><i class="fas fa-spinner fa-spin"></i>Loading...</div>`;
+            list.innerHTML = `<div class="notif-empty"><i class="fas fa-spinner fa-spin mr-2"></i>Loading...</div>`;
 
             const { data: { user } } = await _supabase.auth.getUser();
             if (!user) return;
 
-            // Step 1: Fetch conversations (no profile joins — avoids FK naming issue)
             const { data: convs, error } = await _supabase
                 .from('conversations')
                 .select('id, product_id, buyer_id, seller_id')
@@ -457,42 +538,31 @@
 
             if (error) {
                 console.error("Conversations load error:", error);
-                list.innerHTML = `<div class="notif-empty"><i class="fas fa-exclamation-circle"></i>Failed to load</div>`;
+                list.innerHTML = `<div class="notif-empty"><i class="fas fa-exclamation-circle mr-2"></i>Failed to load</div>`;
                 return;
             }
 
             if (!convs || convs.length === 0) {
-                list.innerHTML = `<div class="notif-empty"><i class="fas fa-comment-slash"></i>No conversations yet</div>`;
+                list.innerHTML = `<div class="notif-empty"><i class="fas fa-comment-slash mr-2"></i>No conversations yet</div>`;
                 badge.style.display = 'none';
                 return;
             }
 
-            // Step 2: Collect all unique user IDs we need profiles for
-            const allUserIds = [...new Set(
-                convs.flatMap(c => [c.buyer_id, c.seller_id])
-            )];
+            // Batch-fetch profiles and products in parallel
+            const allUserIds = [...new Set(convs.flatMap(c => [c.buyer_id, c.seller_id]))];
+            const productIds = [...new Set(convs.map(c => c.product_id))];
 
-            // Step 3: Fetch all those profiles in one query
-            const { data: profiles } = await _supabase
-                .from('profiles')
-                .select('id, first_name, last_name, avatar_url')
-                .in('id', allUserIds);
+            const [{ data: profiles }, { data: products }] = await Promise.all([
+                _supabase.from('profiles').select('id, first_name, last_name, avatar_url').in('id', allUserIds),
+                _supabase.from('products').select('id, title').in('id', productIds)
+            ]);
 
-            // Build a quick lookup map: { userId -> profile }
             const profileMap = {};
             (profiles || []).forEach(p => { profileMap[p.id] = p; });
-
-            // Step 4: Collect all product IDs and fetch titles in one query
-            const productIds = [...new Set(convs.map(c => c.product_id))];
-            const { data: products } = await _supabase
-                .from('products')
-                .select('id, title')
-                .in('id', productIds);
-
             const productMap = {};
             (products || []).forEach(p => { productMap[p.id] = p; });
 
-            // Step 5: Fetch last message for each conversation in parallel
+            // Fetch last message per conversation in parallel
             const lastMsgResults = await Promise.all(
                 convs.map(c =>
                     _supabase
@@ -505,30 +575,28 @@
                 )
             );
 
-            // Step 6: Render
-            badge.textContent   = convs.length;
-            badge.style.display = 'flex';
-            label.textContent   = `${convs.length} total`;
-            list.innerHTML      = '';
+            // Update badge and label
+            badge.textContent  = convs.length;
+            badge.style.display = 'flex'; // FIX: use flex (matches CSS display value)
+            label.textContent  = `${convs.length} total`;
+            list.innerHTML     = '';
 
             convs.forEach((conv, i) => {
-                const iAmBuyer   = conv.buyer_id === user.id;
-                const otherId    = iAmBuyer ? conv.seller_id : conv.buyer_id;
-                const other      = profileMap[otherId] || null;
-                const otherName  = other
+                const iAmBuyer  = conv.buyer_id === user.id;
+                const otherId   = iAmBuyer ? conv.seller_id : conv.buyer_id;
+                const other     = profileMap[otherId] || null;
+                const otherName = other
                     ? (`${other.first_name || ''} ${other.last_name || ''}`).trim() || 'Unknown'
                     : 'Unknown';
-                const otherAvatar   = other?.avatar_url || null;
-                const productTitle  = productMap[conv.product_id]?.title || 'Untitled Product';
-                const tagClass      = iAmBuyer ? 'tag-buyer'  : 'tag-seller';
-                const tagLabel      = iAmBuyer ? 'Seller'      : 'Buyer';
+                const otherAvatar  = other?.avatar_url || null;
+                const productTitle = productMap[conv.product_id]?.title || 'Untitled Product';
+                const tagClass     = iAmBuyer ? 'tag-buyer'  : 'tag-seller';
+                const tagLabel     = iAmBuyer ? 'Seller'     : 'Buyer';
 
-                // Last message preview
                 const lastMsg = lastMsgResults[i]?.data;
                 let lastMsgText = 'No messages yet';
                 if (lastMsg) {
-                    // is_buyer=true means the buyer sent it
-                    const sentByMe = iAmBuyer ? lastMsg.is_buyer : !lastMsg.is_buyer;
+                    const sentByMe    = iAmBuyer ? lastMsg.is_buyer : !lastMsg.is_buyer;
                     const senderLabel = sentByMe ? 'You' : otherName.split(' ')[0];
                     lastMsgText = `${senderLabel}: ${lastMsg.content}`;
                 }
@@ -539,8 +607,8 @@
 
                 const item = document.createElement('a');
                 item.className = 'notif-item';
+                // FIX: href was set twice — second assignment (?id=) overwrote the correct one (?conversation_id=)
                 item.href = `conversation.html?conversation_id=${conv.id}`;
-                item.href = `conversation.html?id=${conv.product_id}`;
                 item.innerHTML = `
                     <div class="notif-avatar">${avatarHtml}</div>
                     <div class="notif-body">
@@ -557,30 +625,29 @@
         function escapeHtml(str) {
             if (!str) return '';
             return String(str)
-                .replace(/&/g, "&amp;").replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
         // ════════════════════════════════════════════════════════════
         //  PROFILE
         // ════════════════════════════════════════════════════════════
-        async function loadProfile() {
-            const { data: { user }, error: userError } = await _supabase.auth.getUser();
-            if (userError || !user) { console.log("No active session found"); return; }
-
-            let { data: profile } = await _supabase
+        // FIX: loadProfile now receives user object from init (no redundant auth call)
+        // FIX: no longer calls loadConversations() or handleUserViewToggle() — init handles those
+        async function loadProfile(user) {
+            const { data: profile } = await _supabase
                 .from('profiles')
                 .select('avatar_url, first_name, last_name, email, contact')
                 .eq('id', user.id)
                 .single();
 
-            const emailField = document.getElementById('profile-email');
-            emailField.value = (profile && profile.email) ? profile.email : user.email;
+            document.getElementById('profile-email').value =
+                (profile?.email) ? profile.email : user.email;
 
             if (profile) {
-                document.getElementById('profile-fname').value    = profile.first_name || '';
-                document.getElementById('profile-lname').value    = profile.last_name  || '';
-                document.getElementById('profile-contact').value  = profile.contact    || '';
+                document.getElementById('profile-fname').value   = profile.first_name || '';
+                document.getElementById('profile-lname').value   = profile.last_name  || '';
+                document.getElementById('profile-contact').value = profile.contact    || '';
                 document.getElementById('profile-password').value = '';
                 if (profile.avatar_url) {
                     document.getElementById('profile-img-display').src = profile.avatar_url;
@@ -588,40 +655,161 @@
                     document.getElementById('profile-icon-placeholder').classList.add('hidden');
                 }
             }
-            handleUserViewToggle()
-            loadConversations();
         }
 
-        window.onload = loadProfile;
-        window.addEventListener('load', fetchMyAds);
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.getElementById('profile-img-display');
+                    img.src = e.target.result;
+                    img.classList.remove('hidden');
+                    document.getElementById('profile-icon-placeholder').classList.add('hidden');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
 
+        async function updateFullProfile() {
+            const btn = document.getElementById('save-profile-btn');
+            btn.innerText = 'Saving...';
+            btn.disabled = true;
+
+            try {
+                const { data: { user } } = await _supabase.auth.getUser();
+                if (!user) throw new Error('You must be logged in.');
+
+                const cont_num = document.getElementById('profile-contact').value.trim();
+                // FIX: early return inside try bypassed finally → btn stayed disabled forever.
+                // Now throw an error instead so finally always runs.
+                if (!/^[0-9]{11}$/.test(cont_num)) throw new Error('Invalid Contact Number (11 digits required)');
+
+                let avatarUrl = null;
+                const { data: currentProfile } = await _supabase
+                    .from('profiles').select('avatar_url').eq('id', user.id).single();
+                if (currentProfile) avatarUrl = currentProfile.avatar_url;
+
+                const fileInput = document.getElementById('avatar-file');
+                if (fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    if (avatarUrl && avatarUrl.includes('/storage/v1/object/public/avatars/')) {
+                        try {
+                            const urlObj   = new URL(avatarUrl);
+                            const oldPath  = urlObj.pathname.split('/storage/v1/object/public/avatars/')[1];
+                            if (oldPath) await _supabase.storage.from('avatars').remove([decodeURIComponent(oldPath)]);
+                        } catch (e) { console.warn('Could not parse old avatar URL:', e); }
+                    }
+                    const fileExt  = file.name.split('.').pop();
+                    const filePath = `${user.id}/avatar-${Date.now()}.${fileExt}`;
+                    const { error: uploadError } = await _supabase.storage
+                        .from('avatars').upload(filePath, file, { upsert: true });
+                    if (uploadError) throw uploadError;
+                    const { data: urlData } = _supabase.storage.from('avatars').getPublicUrl(filePath);
+                    avatarUrl = urlData.publicUrl;
+                }
+
+                const profileUpdates = {
+                    id:         user.id,
+                    first_name: document.getElementById('profile-fname').value.trim(),
+                    last_name:  document.getElementById('profile-lname').value.trim(),
+                    avatar_url: avatarUrl,
+                    updated_at: new Date().toISOString(),
+                    contact:    cont_num,
+                };
+                const { error: dbError } = await _supabase
+                    .from('profiles').upsert(profileUpdates, { onConflict: 'id' });
+                if (dbError) throw dbError;
+
+                const newPass = document.getElementById('profile-password').value;
+                if (newPass && newPass.length > 0) {
+                    if (newPass.length < 6) throw new Error('Password must be at least 6 characters.');
+                    const { error: authError } = await _supabase.auth.updateUser({ password: newPass });
+                    if (authError) throw authError;
+                    document.getElementById('profile-password').value = '';
+                }
+
+                alert('Profile updated successfully!');
+            } catch (error) {
+                console.error('Update failed:', error);
+                alert(`Error: ${error.message}`);
+            } finally {
+                btn.innerText = 'Save Changes';
+                btn.disabled  = false;
+            }
+        }
+
+        // ════════════════════════════════════════════════════════════
+        //  MY ADS
+        // ════════════════════════════════════════════════════════════
         let currentEditingAdId = null;
 
         function previewImages() {
             const container = document.getElementById('image-preview-container');
-            const files = document.getElementById('ad-images').files;
+            const files     = document.getElementById('ad-images').files;
             container.innerHTML = '';
             Array.from(files).forEach(file => {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     const div = document.createElement('div');
-                    div.className = "relative w-20 h-20 border-2 border-black rounded-lg overflow-hidden bg-gray-100";
+                    div.className = 'relative w-20 h-20 rounded-xl overflow-hidden border border-gray-200';
                     div.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
                     container.appendChild(div);
-                }
+                };
                 reader.readAsDataURL(file);
             });
         }
 
+        async function fetchMyAds() {
+            const container  = document.getElementById('my-ads-container');
+            const countBadge = document.getElementById('ad-count');
+            try {
+                const { data: { user } } = await _supabase.auth.getUser();
+                if (!user) return;
+                const { data: ads, error } = await _supabase
+                    .from('products').select('*').eq('user_id', user.id)
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+
+                countBadge.innerText = `${ads.length} ADS`;
+                if (ads.length === 0) {
+                    container.innerHTML = `<p class="text-gray-400 text-sm italic col-span-full text-center py-10">You haven't posted any ads yet.</p>`;
+                    return;
+                }
+                container.innerHTML = '';
+                ads.forEach(ad => {
+                    const displayImage = ad.image_urls?.length > 0
+                        ? ad.image_urls[0]
+                        : 'https://via.placeholder.com/150?text=No+Image';
+                    container.innerHTML += `
+                        <div class="border-2 border-black rounded-2xl p-4 relative ${ad.paid_ad ? 'bg-amber-200' : 'bg-gray-200'} transition-transform hover:scale-[1.02]">
+                            <div class="absolute top-2 right-2 flex space-x-2 z-10">
+                                <i onclick="prepareEdit('${ad.id}')" class="fas fa-pen-to-square text-blue-600 cursor-pointer text-base" title="Edit"></i>
+                                <i onclick="deleteAd('${ad.id}')" class="fas fa-circle-xmark text-red-500 cursor-pointer text-base" title="Delete"></i>
+                                <i onclick="${ad.paid_ad ? "alert('This ad is already boosted!')" : `boostAd('${ad.id}')`}" class="fas fa-rocket text-blue-500 cursor-pointer text-base" title="Boost Ad"></i>
+                            </div>
+                            <div class="w-full h-32 mb-4 overflow-hidden rounded-lg border border-gray-100">
+                                <img src="${displayImage}" class="w-full h-full object-cover" alt="${escapeHtml(ad.title)}">
+                            </div>
+                            <h3 class="font-bold text-sm truncate">${escapeHtml(ad.title)}</h3>
+                            <p class="text-xs text-gray-600 font-bold">Rs ${ad.price.toLocaleString()}</p>
+                            <span class="text-[9px] uppercase font-extrabold text-gray-400 border border-gray-200 px-2 py-0.5 rounded mt-2 inline-block">${escapeHtml(ad.category)}</span>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                console.error('Error fetching ads:', err);
+                container.innerHTML = `<p class="text-red-500 text-sm col-span-full">Failed to load ads.</p>`;
+            }
+        }
+
         async function deleteAd(adId) {
-            if (!confirm("Are you sure you want to delete this ad?")) return;
+            if (!confirm('Are you sure you want to delete this ad?')) return;
             try {
                 const { data: ad } = await _supabase.from('products').select('image_urls').eq('id', adId).single();
                 if (ad?.image_urls?.length > 0) {
                     const pathsToDelete = ad.image_urls.map(url => {
                         try {
-                            const urlObj = new URL(url);
-                            const part = urlObj.pathname.split('/storage/v1/object/public/product-images/')[1];
+                            const part = new URL(url).pathname.split('/storage/v1/object/public/product-images/')[1];
                             return part ? decodeURIComponent(part) : null;
                         } catch { return null; }
                     }).filter(Boolean);
@@ -631,17 +819,59 @@
                 const { error } = await _supabase.from('products').delete().eq('id', adId);
                 if (error) throw error;
                 fetchMyAds();
-            } catch (err) { alert("Delete failed: " + err.message); }
+            } catch (err) { alert('Delete failed: ' + err.message); }
+        }
+
+        async function prepareEdit(adId) {
+            currentEditingAdId = adId;
+            try {
+                const { data: ad, error } = await _supabase.from('products').select('*').eq('id', adId).single();
+                if (error) throw error;
+                document.getElementById('ad-title').value     = ad.title;
+                document.getElementById('ad-price').value     = ad.price;
+                document.getElementById('ad-category').value  = ad.category;
+                document.getElementById('ad-condition').value = ad.condition;
+                document.getElementById('ad-desc').value      = ad.description;
+
+                const titleEl  = document.getElementById('form-title');
+                const submitEl = document.getElementById('submit-btn');
+                titleEl.innerHTML = '<span class="w-2 h-6 bg-blue-500 rounded-full mr-3"></span><span>Update Existing Ad</span>';
+
+                // FIX: was trying classList.replace('bg-black','bg-blue-600') but button uses 'btn-red', not 'bg-black'
+                // Now directly set inline style override so btn-red base stays intact
+                submitEl.innerHTML = 'Update Ad <i class="fas fa-check ml-2 text-xs"></i>';
+                submitEl.style.background = '#2563eb';
+
+                document.getElementById('reset-btn').classList.remove('hidden');
+                document.getElementById('upload-section').scrollIntoView({ behavior: 'smooth' });
+            } catch (err) { alert('Error fetching ad data: ' + err.message); }
+        }
+
+        function resetForm() {
+            currentEditingAdId = null;
+            ['ad-title','ad-price','ad-category','ad-condition','ad-desc'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            document.getElementById('ad-images').value = '';
+            document.getElementById('image-preview-container').innerHTML = '';
+
+            const titleEl  = document.getElementById('form-title');
+            const submitEl = document.getElementById('submit-btn');
+            titleEl.innerHTML  = '<span class="w-2 h-6 bg-red-500 rounded-full mr-3"></span><span>Create New Ad</span>';
+            submitEl.innerHTML = '<span>Publish Ad</span><i class="fas fa-paper-plane text-xs ml-2"></i>';
+            submitEl.style.background = ''; // FIX: clear inline override, btn-red takes over again
+
+            document.getElementById('reset-btn').classList.add('hidden');
         }
 
         async function handlePublishAd() {
-            const title       = document.getElementById('ad-title').value;
+            const title       = document.getElementById('ad-title').value.trim();
             const price       = document.getElementById('ad-price').value;
             const category    = document.getElementById('ad-category').value;
             const condition   = document.getElementById('ad-condition').value;
             const description = document.getElementById('ad-desc').value;
             const imageFiles  = document.getElementById('ad-images').files;
-            if (!title || !price) return alert("Please provide a title and price.");
+            if (!title || !price) return alert('Please provide a title and price.');
             try {
                 const { data: { user } } = await _supabase.auth.getUser();
                 let imageUrls = [];
@@ -650,8 +880,7 @@
                     if (oldAd?.image_urls?.length > 0) {
                         const pathsToDelete = oldAd.image_urls.map(url => {
                             try {
-                                const urlObj = new URL(url);
-                                const part = urlObj.pathname.split('/storage/v1/object/public/product-images/')[1];
+                                const part = new URL(url).pathname.split('/storage/v1/object/public/product-images/')[1];
                                 return part ? decodeURIComponent(part) : null;
                             } catch { return null; }
                         }).filter(Boolean);
@@ -670,66 +899,40 @@
                 }
                 const adData = { title, price: parseFloat(price), category, condition, description, user_id: user.id };
                 if (imageUrls.length > 0) adData.image_urls = imageUrls;
+
                 if (currentEditingAdId) {
                     const { error } = await _supabase.from('products').update(adData).eq('id', currentEditingAdId);
                     if (error) throw error;
-                    alert("Ad Updated!");
+                    alert('Ad Updated!');
                 } else {
-                    if (imageUrls.length === 0) return alert("Please choose at least one image.");
+                    if (imageUrls.length === 0) return alert('Please choose at least one image.');
                     const { error } = await _supabase.from('products').insert([adData]);
                     if (error) throw error;
-                    alert("Ad Published!");
+                    alert('Ad Published!');
                 }
                 resetForm();
                 fetchMyAds();
-            } catch (err) { alert("Action failed: " + err.message); }
+            } catch (err) { alert('Action failed: ' + err.message); }
         }
 
-        async function fetchMyAds() {
-            const container  = document.getElementById('my-ads-container');
-            const countBadge = document.getElementById('ad-count');
-            try {
-                const { data: { user } } = await _supabase.auth.getUser();
-                if (!user) return;
-                const { data: ads, error } = await _supabase
-                    .from('products').select('*').eq('user_id', user.id)
-                    .order('created_at', { ascending: false });
-                if (error) throw error;
-                countBadge.innerText = `${ads.length} ADS`;
-                if (ads.length === 0) {
-                    container.innerHTML = `<p class="text-gray-400 text-sm italic col-span-full text-center py-10">You haven't posted any ads yet.</p>`;
-                    return;
-                }
-                container.innerHTML = '';
-                ads.forEach(ad => {
-                    const displayImage = ad.image_urls?.length > 0 ? ad.image_urls[0] : 'https://via.placeholder.com/150?text=No+Image';
-                    container.innerHTML += `
-                        <div class="border-2 border-black rounded-2xl p-4 relative ${ad.paid_ad ? 'bg-amber-200' : 'bg-gray-200'} transition-transform hover:scale-[1.02]">
-                            <div class="absolute top-2 right-2 flex space-x-2 z-10">
-                                <i onclick="prepareEdit('${ad.id}')" class="fas fa-pen-to-square text-blue-600 action-btn cursor-pointer" title="Edit"></i>
-                                <i onclick="deleteAd('${ad.id}')" class="fas fa-circle-xmark text-red-500 action-btn cursor-pointer" title="Delete"></i>
-                                <i onclick="${ad.paid_ad ? "alert('This ad is already boosted!')" : `boostAd('${ad.id}')`}" class="fas fa-rocket text-blue-500 action-btn cursor-pointer" title="Boost_Ad"></i>
-                            </div>
-                            <div class="w-full h-32 mb-4 overflow-hidden rounded-lg border border-gray-100">
-                                <img src="${displayImage}" class="w-full h-full object-cover" alt="${ad.title}">
-                            </div>
-                            <h3 class="font-bold text-sm truncate">${ad.title}</h3>
-                            <p class="text-xs text-gray-600 font-bold">Rs ${ad.price.toLocaleString()}</p>
-                            <span class="text-[9px] uppercase font-extrabold text-gray-400 border border-gray-200 px-2 py-0.5 rounded mt-2 inline-block">${ad.category}</span>
-                        </div>
-                    `;
-                });
-            } catch (err) {
-                console.error("Error fetching ads:", err);
-                container.innerHTML = `<p class="text-red-500 text-sm col-span-full">Failed to load ads.</p>`;
-            }
+        // ════════════════════════════════════════════════════════════
+        //  BOOST MODAL
+        // ════════════════════════════════════════════════════════════
+        function boostAd(adId) {
+            document.getElementById('targetAdId').value = adId;
+            document.getElementById('boostModal').classList.add('open');
         }
 
-        function boostAd(ad_id) {
-            document.getElementById('targetAdId').value = ad_id;
-            const modal = document.getElementById('boostModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+        function closeBoostModal() {
+            document.getElementById('boostModal').classList.remove('open');
+            document.getElementById('cardNumber').value = '';
+            document.getElementById('expiry').value     = '';
+            document.getElementById('cvv').value        = '';
+        }
+
+        function formatCardNumber(input) {
+            let v = input.value.replace(/\D/g, '').slice(0, 16);
+            input.value = v.replace(/(.{4})/g, '$1 ').trim();
         }
 
         async function validateAndSubmit() {
@@ -737,169 +940,125 @@
             const card   = document.getElementById('cardNumber').value.replace(/\s/g, '');
             const expiry = document.getElementById('expiry').value;
             const cvv    = document.getElementById('cvv').value;
-            if (!/^[0-9]{16}$/.test(card))   return alert("Invalid Card Number (16 digits required)");
-            if (!/^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(expiry)) return alert("Invalid Expiry (MM/YY)");
-            if (!/^[0-9]{3}$/.test(cvv))      return alert("Invalid CVV (3 digits)");
+            if (!/^[0-9]{16}$/.test(card))                             return alert('Invalid Card Number (16 digits required)');
+            if (!/^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(expiry))       return alert('Invalid Expiry (MM/YY)');
+            if (!/^[0-9]{3}$/.test(cvv))                               return alert('Invalid CVV (3 digits)');
             try {
                 const { data: { user }, error: authError } = await _supabase.auth.getUser();
-                if (authError || !user) { alert("You must be logged in to boost an ad."); return; }
+                if (authError || !user) { alert('You must be logged in to boost an ad.'); return; }
                 const { error } = await _supabase.from('products')
                     .update({ paid_ad: true }).eq('id', adId).eq('user_id', user.id);
                 if (error) throw error;
-                alert("🚀 Payment Successful! Your ad has been boosted.");
+                alert('🚀 Payment Successful! Your ad has been boosted.');
                 closeBoostModal();
-                location.reload();
-            } catch (error) { alert("Error updating ad: " + error.message); }
+                fetchMyAds();
+            } catch (error) { alert('Error updating ad: ' + error.message); }
         }
 
-        function closeBoostModal() {
-            const modal = document.getElementById('boostModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-
-        function previewImage(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.getElementById('profile-img-display');
-                    img.src = e.target.result;
-                    img.classList.remove('hidden');
-                    document.getElementById('profile-icon-placeholder').classList.add('hidden');
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        async function updateFullProfile() {
-            const btn = document.getElementById('save-profile-btn');
-            btn.innerText = "Saving...";
-            btn.disabled = true;
-            try {
-                const { data: { user } } = await _supabase.auth.getUser();
-                if (!user) throw new Error("You must be logged in.");
-                const cont_num = document.getElementById('profile-contact').value.trim();
-                if (!/^[0-9]{11}$/.test(cont_num)) return alert("Invalid Contact Number (11 digits required)");
-                let avatarUrl = null;
-                const { data: currentProfile } = await _supabase.from('profiles').select('avatar_url').eq('id', user.id).single();
-                if (currentProfile) avatarUrl = currentProfile.avatar_url;
-                const fileInput = document.getElementById('avatar-file');
-                if (fileInput.files.length > 0) {
-                    const file = fileInput.files[0];
-                    if (avatarUrl && avatarUrl.includes('/storage/v1/object/public/avatars/')) {
-                        try {
-                            const urlObj = new URL(avatarUrl);
-                            const oldPath = urlObj.pathname.split('/storage/v1/object/public/avatars/')[1];
-                            if (oldPath) await _supabase.storage.from('avatars').remove([decodeURIComponent(oldPath)]);
-                        } catch (e) { console.warn("Could not parse old avatar URL:", e); }
-                    }
-                    const fileExt  = file.name.split('.').pop();
-                    const filePath = `${user.id}/avatar-${Date.now()}.${fileExt}`;
-                    const { error: uploadError } = await _supabase.storage.from('avatars').upload(filePath, file, { upsert: true });
-                    if (uploadError) throw uploadError;
-                    const { data: urlData } = _supabase.storage.from('avatars').getPublicUrl(filePath);
-                    avatarUrl = urlData.publicUrl;
-                }
-                const profileUpdates = {
-                    id: user.id,
-                    first_name:  document.getElementById('profile-fname').value.trim(),
-                    last_name:   document.getElementById('profile-lname').value.trim(),
-                    avatar_url:  avatarUrl,
-                    updated_at:  new Date().toISOString(),
-                    contact:     cont_num,
-                };
-                const { error: dbError } = await _supabase.from('profiles').upsert(profileUpdates, { onConflict: 'id' });
-                if (dbError) throw dbError;
-                const newPass = document.getElementById('profile-password').value;
-                if (newPass && newPass.length > 0) {
-                    if (newPass.length < 6) throw new Error("Password must be at least 6 characters.");
-                    const { error: authError } = await _supabase.auth.updateUser({ password: newPass });
-                    if (authError) throw authError;
-                    document.getElementById('profile-password').value = "";
-                }
-                alert("Profile updated successfully!");
-            } catch (error) {
-                console.error("Update failed:", error);
-                alert(`Error: ${error.message}`);
-            } finally {
-                btn.innerText = "Save Changes";
-                btn.disabled = false;
-            }
-        }
-
-        async function prepareEdit(adId) {
-            currentEditingAdId = adId;
-            try {
-                const { data: ad, error } = await _supabase.from('products').select('*').eq('id', adId).single();
-                if (error) throw error;
-                document.getElementById('ad-title').value     = ad.title;
-                document.getElementById('ad-price').value     = ad.price;
-                document.getElementById('ad-category').value  = ad.category;
-                document.getElementById('ad-condition').value = ad.condition;
-                document.getElementById('ad-desc').value      = ad.description;
-                document.getElementById('form-title').innerHTML = '<i class="fas fa-edit mr-3"></i> Update Existing Ad';
-                document.getElementById('submit-btn').innerHTML = 'Update Ad <i class="fas fa-check ml-2 text-xs"></i>';
-                document.getElementById('submit-btn').classList.replace('bg-black', 'bg-blue-600');
-                document.getElementById('reset-btn').classList.remove('hidden');
-                document.getElementById('upload-section').scrollIntoView({ behavior: 'smooth' });
-            } catch (err) { alert("Error fetching ad data: " + err.message); }
-        }
-
-        function resetForm() {
-            currentEditingAdId = null;
-            document.getElementById('ad-title').value     = '';
-            document.getElementById('ad-price').value     = '';
-            document.getElementById('ad-category').value  = '';
-            document.getElementById('ad-condition').value = '';
-            document.getElementById('ad-desc').value      = '';
-            document.getElementById('ad-images').value    = '';
-            document.getElementById('image-preview-container').innerHTML = '';
-            document.getElementById('form-title').innerHTML = '<i class="fas fa-upload mr-3"></i> Upload Ad';
-            document.getElementById('submit-btn').innerHTML = 'Publish Ad <i class="fas fa-paper-plane ml-2 text-xs"></i>';
-            document.getElementById('submit-btn').classList.remove('bg-blue-600');
-            document.getElementById('submit-btn').classList.add('bg-black');
-            document.getElementById('reset-btn').classList.add('hidden');
-        }
+        // ════════════════════════════════════════════════════════════
+        //  TECHNICIAN TOGGLE
+        // ════════════════════════════════════════════════════════════
         async function checkIfTechnician() {
             const { data: { user }, error: userError } = await _supabase.auth.getUser();
-
             if (userError || !user) return false;
             const { data, error } = await _supabase
-                .from('technicians')
-                .select('id')
-                .eq('id', user.id)
-                .maybeSingle()
-            if (error) {
-                console.error("Error checking technician status:", error);
-                return false;
-            }
-
-            // 3. Return true if data exists, false if it's null
+                .from('technicians').select('id').eq('id', user.id).maybeSingle();
+            if (error) { console.error('Error checking technician status:', error); return false; }
             return data !== null;
         }
+
         async function handleUserViewToggle() {
-            // Determine technician status
             const isTech = await checkIfTechnician();
             const applySection = document.getElementById('apply-tech');
             const promoSection = document.getElementById('tech-promo');
-
             if (isTech) {
-                // User is a technician: Show the Dashboard link, hide the application form
-                if (promoSection) promoSection.style.display = 'block';
-                if (applySection) applySection.style.display = 'none';
+                promoSection.style.display = 'block';
+                applySection.style.display = 'none';
             } else {
-                // User is a customer: Show the "Become a Technician" application CTA
-                if (promoSection) promoSection.style.display = 'none';
-                if (applySection) applySection.style.display = 'block';
+                promoSection.style.display = 'none';
+                applySection.style.display = 'block';
             }
         }
-            
-        async function checkUser() {
-            const { data: { user } } = await _supabase.auth.getUser();
-            if (!user) window.location.href = 'registration.html';
-        }
-        checkUser();
 
+        // ════════════════════════════════════════════════════════════
+        //  REPAIR PROGRESS
+        // ════════════════════════════════════════════════════════════
+        async function loadSellerRepairs() {
+            const repairList       = document.getElementById('seller-repair-list');
+            const repairCountLabel = document.getElementById('repair-count');
+            if (!repairList) return;
+
+            const { data: { user } } = await _supabase.auth.getUser();
+            if (!user) return;
+
+            const { data: repairs, error } = await _supabase
+                .from('repair_orders')
+                .select('*, products (*)')
+                .eq('buyer_id', user.id)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                repairList.innerHTML = `<p class="text-red-500">Error loading progress.</p>`;
+                return;
+            }
+
+            if (repairCountLabel) repairCountLabel.innerText = `${repairs.length} Items`;
+
+            if (!repairs || repairs.length === 0) {
+                repairList.innerHTML = `<p class="text-gray-400 text-center py-10">You haven't sent any items for repair yet.</p>`;
+                return;
+            }
+
+            repairList.innerHTML = repairs.map(order => {
+                const item = order.products;
+                let statusText  = 'Waiting for Technician';
+                let statusColor = 'text-gray-400';
+                if (order.is_delivered)      { statusText = 'Delivered & Fixed';       statusColor = 'text-green-500';  }
+                else if (order.is_completed) { statusText = 'Ready for Pickup';        statusColor = 'text-blue-500';   }
+                else if (order.is_working)   { statusText = 'Technician is Repairing'; statusColor = 'text-red-500';    }
+                else if (order.is_received)  { statusText = 'Received by Tech';        statusColor = 'text-orange-500'; }
+
+                const pct = order.is_delivered ? '100%' : order.is_completed ? '75%' : order.is_working ? '50%' : order.is_received ? '25%' : '5%';
+
+                return `
+                    <div class="card-modern flex flex-col md:flex-row gap-6 border-l-4 ${order.is_delivered ? 'border-l-green-500' : 'border-l-red-500'}">
+                        <div class="w-full md:w-40 h-40 flex-shrink-0">
+                            <img src="${item.image_urls?.[0] ?? 'https://via.placeholder.com/300'}"
+                                class="w-full h-full object-cover rounded-2xl">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="text-xl font-bold text-slate-900">${escapeHtml(item.title)}</h3>
+                                    <p class="${statusColor} text-xs font-black uppercase tracking-widest mt-1">
+                                        <i class="fa fa-circle text-[8px] mr-1 animate-pulse"></i> ${statusText}
+                                    </p>
+                                </div>
+                                <span class="text-[10px] font-bold text-gray-400">Order #${order.id.slice(0, 8)}</span>
+                            </div>
+                            <div class="mt-8">
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-[10px] font-bold ${order.is_received  ? 'text-slate-900' : 'text-gray-300'}">RECEIVED</span>
+                                    <span class="text-[10px] font-bold ${order.is_working   ? 'text-slate-900' : 'text-gray-300'}">REPAIRING</span>
+                                    <span class="text-[10px] font-bold ${order.is_completed ? 'text-slate-900' : 'text-gray-300'}">FIXED</span>
+                                    <span class="text-[10px] font-bold ${order.is_delivered ? 'text-slate-900' : 'text-gray-300'}">DELIVERED</span>
+                                </div>
+                                <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                                    <div class="bg-red-500 h-full transition-all duration-700" style="width:${pct}"></div>
+                                </div>
+                            </div>
+                            <p class="text-gray-500 text-[11px] mt-4 italic">
+                                * Please contact your technician via the message center if you have questions.
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ════════════════════════════════════════════════════════════
+        //  AUTH
+        // ════════════════════════════════════════════════════════════
         async function handleLogout() {
             await _supabase.auth.signOut();
             window.location.href = 'registration.html';

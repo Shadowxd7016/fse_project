@@ -1,19 +1,7 @@
-// 1. Declare data globally
 let allProductsData = []; 
-console.log("Script loaded, waiting for DOMContentLoaded...");
-// 2. This runs immediately to set up the "Watchman"
-const searchInput = document.getElementById('searchInput');
-
-searchInput.addEventListener('input', (e) => {
-    const searchTerm = e.target.value.toLowerCase().trim();
-    console.log("User is typing:", searchTerm); // Debugging line
-    
-    // Call the filter function
-    handleSearch(searchTerm);
-});
 
 async function initApp() {
-    // 3. Fetch data from Supabase
+    // Fetch all products from Supabase
     const { data, error } = await db.from('products').select('*');
     
     if (error) {
@@ -22,82 +10,84 @@ async function initApp() {
     }
 
     allProductsData = data;
-    renderCategories(allProductsData); // Initial UI setup
-    console.log("Data loaded and ready for searching");
+    renderCategories(allProductsData); 
+    setupSearchListener();
 }
 
-
-
-function handleSearch(searchTerm) {
-  const categoryContainer = document.getElementById('category-sections');
-  const allCategories = document.getElementById('all-categories');
-  const searchSection = document.getElementById('search-results-section');
-  const searchGrid = document.getElementById('search-grid');
-
-  if (searchTerm === "") {
-    // If search is empty, show categories again
-    categoryContainer.classList.remove('hidden');
-    allCategories.classList.remove('hidden');
-    searchSection.classList.add('hidden');
-    return;
-  }
-
-  // Filter products based on title, category, or description
-  const filtered = allProductsData.filter(product => 
-    product.title.toLowerCase().includes(searchTerm) || 
-    product.category.toLowerCase().includes(searchTerm)
-  );
-
-  // Switch UI to Search Mode — hide both category containers
-  categoryContainer.classList.add('hidden');
-  allCategories.classList.add('hidden');
-  searchSection.classList.remove('hidden');
-
-  // Display results
-  if (filtered.length > 0) {
-    searchGrid.innerHTML = filtered.map(product => createProductHTML(product)).join('');
-  } else {
-    searchGrid.innerHTML = `<p class="text-gray-500">No results found for "${searchTerm}"</p>`;
-  }
-}
-
-// Helper function to keep code DRY (Don't Repeat Yourself)
 function createProductHTML(product) {
-  return `
-    <div class="group relative">
-      <img src="${product.image_urls?.[0] || 'https://via.placeholder.com/400'}" 
-           class="aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:h-80" />
-      <div class="mt-4 flex justify-between">
-        <div>
-          <h3 class="text-sm text-gray-700">
-            <a href="/product-detail.html?id=${product.id}">
-              <span aria-hidden="true" class="absolute inset-0"></span>
-              ${product.title}
-            </a>
-          </h3>
-          <p class="mt-1 text-sm text-gray-500">${product.category}</p>
+    // Accessing the image_urls array from your schema
+    const firstImage = (product.image_urls && product.image_urls.length > 0) 
+        ? product.image_urls[0] 
+        : 'https://via.placeholder.com/400';
+
+    // Show title, price, category, condition, and description
+    return `
+        <div class="group relative bg-white p-4 rounded-2xl shadow-sm border border-gray-100 transition-all hover:shadow-lg hover:border-red-200">
+            <div class="aspect-square w-full overflow-hidden rounded-xl bg-gray-50">
+                <img src="${firstImage}" alt="${product.title}" class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300">
+            </div>
+            
+            <div class="mt-4">
+                <div class="flex justify-between items-start mb-1">
+                    <h3 class="text-sm font-bold text-gray-900 truncate flex-1">
+                        <a href="product.html?id=${product.id}">
+                            <span aria-hidden="true" class="absolute inset-0"></span>
+                            ${product.title}
+                        </a>
+                    </h3>
+                    <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 bg-gray-100 text-gray-600 rounded ml-2">
+                        ${product.condition || 'Used'}
+                    </span>
+                </div>
+                
+                <p class="text-xs text-gray-500 mb-2">${product.category}</p>
+                
+                <p class="text-xs text-gray-400 line-clamp-2 mb-3 h-8">
+                    ${product.description || 'No description provided.'}
+                </p>
+
+                <div class="flex items-center justify-between border-t border-gray-50 pt-3">
+                    <p class="text-md font-extrabold text-red-600">Rs. ${Number(product.price).toLocaleString()}</p>
+                    <span class="material-symbols-outlined text-gray-300 text-sm">arrow_forward</span>
+                </div>
+            </div>
         </div>
-        <p class="text-sm font-medium text-gray-900">$${product.price}</p>
-      </div>
-    </div>
-  `;
+    `;
 }
 
-// Your existing logic wrapped in a function
 function renderCategories(data) {
-  const categories = {
-    'Mobile Phones': 'grid-mobile',
-    'Laptops': 'grid-laptop',
-    'Tablets': 'grid-tablet',
-    'Cameras': 'grid-camera' 
-  };
+    const categoriesMapping = {
+        'Mobile Phones': 'grid-mobile',
+        'Laptops': 'grid-laptop',
+        'Tablets': 'grid-tablet',
+        'Cameras': 'grid-camera' 
+    };
 
-  Object.entries(categories).forEach(([name, gridId]) => {
-    const gridElement = document.getElementById(gridId);
-    if (!gridElement) return;
-    const filtered = data.filter(p => p.category === name).slice(0, 4);
-    gridElement.innerHTML = filtered.map(product => createProductHTML(product)).join('');
-  });
+    const displayedIds = new Set();
+
+    // Loop through categories and show ALL products (no slicing)
+    Object.entries(categoriesMapping).forEach(([name, gridId]) => {
+        const gridElement = document.getElementById(gridId);
+        if (!gridElement) return;
+
+        // Filter by the exact category string in your DB
+        const filtered = data.filter(p => p.category === name);
+        
+        gridElement.innerHTML = filtered.map(product => {
+            displayedIds.add(product.id);
+            return createProductHTML(product);
+        }).join('');
+    });
+
+    // Handle products that don't match the standard 4 categories
+    const otherGrid = document.getElementById('grid-others');
+    if (otherGrid) {
+        const others = data.filter(p => !displayedIds.has(p.id));
+        if (others.length > 0) {
+            document.getElementById('others-section').classList.remove('hidden');
+            otherGrid.innerHTML = others.map(product => createProductHTML(product)).join('');
+        }
+    }
 }
 
 document.addEventListener('DOMContentLoaded', initApp);

@@ -3,73 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FixKar - Select Technician</title>
+    <title>FixKar | Select Technician</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        
         :root {
-            --orange: #e67e22; --orange-light: #f39c12; --dark: #0f172a;
-            --muted: #64748b; --bg: #f8f6f2; --white: #ffffff;
-            --card-bg: #fffdf9; --border: #e8e0d0;
+            --red: #ef4444;
+            --red-dark: #dc2626;
+            --dark: #0f172a;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-500: #6b7280;
+            --border: #f1f5f9;
+            --white: #ffffff;
         }
-        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--dark); min-height: 100vh; padding-bottom: 120px; }
 
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: var(--gray-50); 
+            color: var(--dark); 
+            min-height: 100vh; 
+            padding-bottom: 140px; 
+        }
+
+        /* ── NAVBAR SYNC ── */
         nav {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 1.2rem 2.5rem; background: var(--white);
-            border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
+            padding: 1.2rem 5%; background: var(--white);
+            border-bottom: 1px solid var(--gray-100); position: sticky; top: 0; z-index: 100;
         }
-        .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.7rem; color: var(--dark); text-decoration: none; }
-        .logo span { color: var(--orange); }
-        .nav-links { display: flex; gap: 2.5rem; align-items: center; }
-        .nav-links a { text-decoration: none; color: var(--muted); font-weight: 600; font-size: 0.95rem; }
+        .logo { font-weight: 800; font-size: 1.6rem; text-decoration: none; color: var(--dark); italic; }
+        .logo span { color: var(--red); }
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
+        .nav-links a { text-decoration: none; color: var(--gray-500); font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
+        .nav-links a:hover { color: var(--red); }
 
-        .page-header { max-width: 1200px; margin: 40px auto; padding: 0 2.5rem; }
-        .product-pill { display: inline-block; background: var(--white); padding: 8px 20px; border-radius: 100px; border: 1px solid var(--border); margin-bottom: 15px; font-size: 0.85rem; }
-        .page-title { font-family: 'Syne', sans-serif; font-size: 2.5rem; font-weight: 800; }
-        .page-title span { color: var(--orange); }
+        /* ── HEADER ── */
+        .page-header { max-width: 1200px; margin: 50px auto 30px; padding: 0 2.5rem; }
+        .product-pill { 
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--white); padding: 8px 18px; border-radius: 100px; 
+            border: 1px solid var(--border); margin-bottom: 20px; font-size: 0.85rem; 
+            font-weight: 600; color: var(--gray-500);
+        }
+        .product-pill strong { color: var(--red); }
+        .page-title { font-size: 2.8rem; font-weight: 800; letter-spacing: -0.02em; }
+        .page-title span { color: var(--red); }
 
+        /* ── TECHNICIAN GRID ── */
         .main-content { max-width: 1200px; margin: 0 auto; padding: 0 2.5rem; }
         .tech-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
 
         .tech-card {
-            background: var(--card-bg); border: 2px solid var(--border);
-            border-radius: 24px; padding: 30px; cursor: pointer; transition: all 0.3s ease; position: relative;
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: 24px; padding: 30px; cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative;
         }
-        .tech-card:hover { border-color: #f5c08a; transform: translateY(-5px); }
-        .tech-card.selected { border-color: var(--orange); background: #fffcf0; }
+        .tech-card:hover { transform: translateY(-5px); border-color: var(--red); box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
+        .tech-card.selected { border-color: var(--red); border-width: 2px; background: #fffcfc; box-shadow: 0 15px 30px rgba(239, 68, 68, 0.08); }
         
-        /* Updated Avatar Style to handle Images */
         .tech-avatar { 
-            width: 70px; height: 70px; border-radius: 20px; 
-            background: var(--orange); color: white; 
+            width: 75px; height: 75px; border-radius: 20px; 
+            background: var(--dark); color: white; 
             display: flex; align-items: center; justify-content: center; 
-            font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.6rem; 
+            font-weight: 800; font-size: 1.6rem; 
             margin-bottom: 20px; overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
-        .tech-avatar img {
-            width: 100%; height: 100%; object-fit: cover;
-        }
+        .tech-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-        .tech-name { font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 4px; }
-        .tech-email { color: var(--muted); font-size: 0.85rem; margin-bottom: 12px; display: block; }
-        .tech-expertise { font-weight: 700; color: var(--orange); margin-bottom: 18px; font-size: 0.95rem; }
-        .tech-meta { border-top: 1px solid var(--border); padding-top: 18px; display: flex; flex-direction: column; gap: 10px; font-size: 0.85rem; color: var(--muted); }
+        .tech-name { font-size: 1.35rem; font-weight: 800; margin-bottom: 5px; color: var(--dark); }
+        .tech-email { color: var(--gray-500); font-size: 0.85rem; margin-bottom: 12px; display: block; font-weight: 500; }
+        .tech-expertise { font-weight: 700; color: var(--red); margin-bottom: 20px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.02em;}
+        
+        .tech-meta { border-top: 1px solid var(--gray-100); padding-top: 20px; display: flex; flex-direction: column; gap: 12px; font-size: 0.85rem; color: var(--gray-500); font-weight: 500; }
+        .meta-item { display: flex; align-items: center; gap: 10px; }
+        .meta-item span { color: var(--red); font-size: 1.2rem; }
 
+        /* ── SUBMIT BAR SYNC ── */
         .submit-bar {
-            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-            width: 95%; max-width: 1000px; background: var(--white);
-            padding: 20px 45px; border-radius: 100px; border: 1px solid var(--border);
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 900px; background: var(--dark);
+            padding: 22px 45px; border-radius: 100px; 
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1); z-index: 1000;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); z-index: 1000;
         }
-        .btn-submit { background: var(--dark); color: white; border: none; padding: 14px 38px; border-radius: 100px; font-weight: 700; cursor: pointer; }
-        .btn-submit:disabled { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
+        .selected-info p { font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; margin-bottom: 2px;}
+        .selected-info strong { color: var(--white); font-size: 1.1rem; }
 
-        .success-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(8px); }
-        .success-modal { background: white; padding: 40px; border-radius: 40px; text-align: center; max-width: 450px; width: 90%; }
+        .btn-submit { 
+            background: var(--red); color: white; border: none; padding: 14px 40px; 
+            border-radius: 100px; font-weight: 800; cursor: pointer; transition: 0.3s;
+            font-size: 1rem;
+        }
+        .btn-submit:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+        .btn-submit:hover:not(:disabled) { background: var(--white); color: var(--dark); transform: scale(1.05); }
+
+        /* ── SUCCESS MODAL ── */
+        .success-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(10px); }
+        .success-modal { background: white; padding: 60px 40px; border-radius: 40px; text-align: center; max-width: 450px; width: 90%; }
+        .success-icon { font-size: 5rem; color: #22c55e; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -84,30 +123,33 @@
 </nav>
 
 <div class="page-header">
-    <div class="product-pill">🛠️ Item: <strong id="prodName">...</strong></div>
+    <div class="product-pill">
+        <span class="material-symbols-outlined" style="font-size: 1.2rem;">construction</span>
+        Repair for: <strong id="prodName">...</strong>
+    </div>
     <h1 class="page-title">Select <span>Technician</span></h1>
 </div>
 
 <div class="main-content">
     <div class="tech-grid" id="techGrid">
-        <p>Loading experts...</p>
+        <p style="padding: 40px; color: var(--gray-500);">Searching for experts...</p>
     </div>
 </div>
 
 <div class="submit-bar">
-    <div>
-        <p style="font-size: 0.75rem; color: var(--muted);">SELECTED EXPERT</p>
-        <strong id="selectedName">Please select above</strong>
+    <div class="selected-info">
+        <p>Selected Professional</p>
+        <strong id="selectedName">None chosen yet</strong>
     </div>
-    <button class="btn-submit" id="submitBtn" disabled onclick="submitRepair()">Confirm Request</button>
+    <button class="btn-submit" id="submitBtn" disabled onclick="submitRepair()">Send Request</button>
 </div>
 
 <div class="success-overlay" id="successOverlay">
     <div class="success-modal">
-        <div style="font-size: 3rem; margin-bottom: 20px;">✅</div>
-        <h2 style="font-family: 'Syne'; margin-bottom: 15px;">Request Submitted</h2>
-        <p style="color: var(--muted);">Your request has been sent.</p>
-        <button class="btn-submit" style="margin-top: 25px; width: 100%;" onclick="window.location.href='home.html'">Back to Home</button>
+        <div class="success-icon">check_circle</div>
+        <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 15px;">Request Sent!</h2>
+        <p style="color: var(--gray-500); line-height: 1.6; margin-bottom: 30px;">The technician has been notified. They will review your product details and contact you via your profile email.</p>
+        <button class="btn-submit" style="width: 100%;" onclick="window.location.href='home.html'">Back to Home</button>
     </div>
 </div>
 
@@ -124,7 +166,6 @@
         const grid = document.getElementById('techGrid');
         
         try {
-            // Fetch first_name, last_name, email, AND avatar_url from profiles
             const { data, error } = await db
                 .from('technicians')
                 .select(`
@@ -145,9 +186,7 @@
             data.forEach(tech => {
                 const profile = tech.profiles;
                 const fullName = `${profile.first_name} ${profile.last_name}`;
-                const initials = (profile.first_name[0] + (profile.last_name ? profile.last_name[0] : '')).toUpperCase();
-                
-                // Logic for Avatar Image vs Initials
+                    const initials = (profile.first_name[0] + (profile.last_name ? profile.last_name[0] : '')).toUpperCase();
                 let avatarContent = initials;
                 if (profile.avatar_url && profile.avatar_url.trim() !== "") {
                     avatarContent = `<img src="${profile.avatar_url}" alt="${fullName}" onerror="this.parentElement.innerHTML='${initials}'">`;
@@ -169,38 +208,50 @@
                     <span class="tech-email">${profile.email}</span>
                     <p class="tech-expertise">🔧 ${tech.category || 'General Repair'}</p>
                     <div class="tech-meta">
-                        <div>⚡ ${tech.experience_years} Years Experience</div>
-                        <div style="color: #22c55e;">● Online & Available</div>
+                        <div class="meta-item">
+                            <span class="material-symbols-outlined">verified</span>
+                            ${tech.experience_years} Years Experience
+                        </div>
+                        <div class="meta-item" style="color: #22c55e;">
+                            <span class="material-symbols-outlined">bolt</span>
+                            Available Now
+                        </div>
                     </div>
                 `;
                 grid.appendChild(card);
             });
         } catch (err) {
-            grid.innerHTML = `<p style="color: red;">Failed to load: ${err.message}</p>`;
+            grid.innerHTML = `<p style="color: red; padding: 40px;">Failed to load: ${err.message}</p>`;
         }
     }
 
     async function submitRepair() {
-        try {
-            const { data: { user } } = await db.auth.getUser();
-            if(!user) { alert("Please login first"); return; }
-
-            const { error } = await db.from('repair_requests').insert([{
-                technician_id: selectedTechId,
-                seller_id: user.id,
-                product_id: productId,
-                received: false,
-                working: false,
-                completed: false,
-                delivered: false
-            }]);
-
-            if(error) throw error;
-            document.getElementById('successOverlay').style.display = 'flex';
-        } catch (err) {
-            alert("Error: " + err.message);
+    try {
+        const { data: { user } } = await db.auth.getUser();
+        if (!user) { 
+            alert("Please login first"); 
+            return; 
         }
+        const { error } = await db.from('repair_orders').insert([{
+            technician_id: selectedTechId,
+            buyer_id: user.id,
+            product_id: productId, // Ensure this is the 'id' from your products table
+            is_received: false,
+            is_working: false,
+            is_completed: false,
+            is_delivered: false
+        }]);
+
+        if (error) throw error;
+
+        // Show success UI
+        document.getElementById('successOverlay').style.display = 'flex';
+        
+    } catch (err) {
+        console.error("Submission Error:", err);
+        alert("Error: " + err.message);
     }
+}
 
     loadTechnicians();
 </script>
