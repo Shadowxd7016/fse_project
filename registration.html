@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FixKar - Authentication</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        
+        .outline-text {
+            color: white;
+            -webkit-text-stroke: 1.5px black;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .input-field {
+            border: 1.5px solid black;
+            border-radius: 0.75rem;
+            padding: 0.6rem 1rem;
+            width: 100%;
+            outline: none;
+            font-size: 0.875rem;
+        }
+
+        .btn-black {
+            background: black;
+            color: white;
+            border-radius: 9999px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-social {
+            border: 1.5px solid black;
+            border-radius: 9999px;
+            padding: 0.5rem 1rem;
+            width: 100%;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* Slide Transition Logic */
+        #slider-container {
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+            width: 200%;
+        }
+        .page-view {
+            width: 50%;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body class="bg-white">
+
+    <div id="slider-container">
+        
+        <div class="page-view min-h-screen flex flex-col md:flex-row p-8 md:p-20 items-center justify-center gap-12">
+            <div class="max-w-md">
+                <div class="text-4xl font-bold italic text-red-600 flex items-center mb-6">
+                    <img src="Picture1.png" alt="logo" class="w-60 h-25" style="padding: 0% 5%;margin-left: 14%;">
+                    <span class="ml-2 text-xl not-italic text-gray-400"></span>
+                </div>
+                <h1 class="text-6xl outline-text mb-6">SELL FAST.<br>BUY EASY.<br>GO GREEN.</h1>
+                <div class="border-2 border-black p-4 rounded-xl max-w-xs">
+                    <p class="font-bold text-sm">Pakistan's most trusted eco-friendly marketplace.</p>
+                </div>
+                <div class="mt-20 flex gap-4">
+                    <div class="border-2 border-black p-4 rounded-xl w-40">
+                        <p class="font-extrabold">10k+</p>
+                        <p class="text-[10px] uppercase text-gray-500">Verified Sellers</p>
+                    </div>
+                    <div class="border-2 border-black p-4 rounded-xl w-40">
+                        <p class="font-extrabold">100%</p>
+                        <p class="text-[10px] uppercase text-gray-500">Secure Trade</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="max-w-sm w-full space-y-4">
+                <h2 class="text-2xl font-extrabold uppercase">Join FixKar</h2>
+                <p class="text-[10px] font-bold text-gray-400 uppercase -mt-2">Create your secure account</p>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] font-bold uppercase">First Name</label>
+                        <input type="text" placeholder="John" id="first-name" class="input-field">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase">Last Name</label>
+                        <input type="text" placeholder="Doe" id="last-name" class="input-field">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase">Email Address</label>
+                    <input type="email" placeholder="john@example.com" id="reg-email" required class="input-field">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase">Contact Number</label>
+                    <input type="text" placeholder="0300-1234567" id="reg-contact" class="input-field" required>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase">Password</label>
+                    <input type="password" placeholder="........" id="reg-password" class="input-field">
+                </div>
+
+                <button onclick="handleSignUp()" class="btn-black mt-4">START SELLING &rarr;</button>
+
+                <div class="relative py-4 flex items-center">
+                    <div class="flex-grow border-t border-gray-300"></div>
+                    <span class="flex-shrink mx-4 text-[10px] font-bold text-gray-400 uppercase">Verified Social Sign-on</span>
+                    <div class="flex-grow border-t border-gray-300"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <button class="btn-social">Google</button>
+                    <button class="btn-social">Facebook</button>
+                </div>
+
+                <p class="text-center text-[10px] font-bold text-gray-400 mt-6">
+                    MEMBER ALREADY? <button onclick="slideToLogin()" class="underline hover:text-black">LOG IN HERE</button>
+                </p>
+            </div>
+        </div>
+
+        <div class="page-view min-h-screen flex flex-col md:flex-row-reverse p-8 md:p-20 items-center justify-center gap-12">
+            <div class="max-w-md">
+                <div class="text-4xl font-bold italic text-red-600 flex items-center mb-6">
+                    <img src="Picture1.png" alt="logo" class="w-60 h-25" style="padding: 0% 5%;margin-left: 12%;">
+                    <span class="ml-2 text-xl not-italic text-gray-400"></span>
+                </div>
+                <h1 class="text-6xl outline-text mb-6">WELCOME<br>BACK TO<br>THE HUB.</h1>
+                <div class="border-2 border-black p-4 rounded-xl max-w-xs">
+                    <p class="font-bold text-sm">Manage your listings and chat with buyers.</p>
+                </div>
+                <div class="mt-12">
+                   <span class="bg-black text-white text-[10px] px-3 py-1 rounded-md font-bold">⚡ Top Rated Marketplace</span>
+                </div>
+            </div>
+
+            <div class="max-w-sm w-full space-y-4">
+                <h2 class="text-2xl font-extrabold uppercase">Log In</h2>
+                <p class="text-[10px] font-bold text-gray-400 uppercase -mt-2">Enter your credentials to access Fixkar</p>
+                
+                <div>
+                    <label class="text-[10px] font-bold uppercase">Email Address</label>
+                    <input type="email" placeholder="name@company.com" id="login-email" class="input-field">
+                </div>
+                <div class="relative">
+                    <div class="flex justify-between">
+                        <label class="text-[10px] font-bold uppercase">Password</label>
+                        <a href="#" class="text-[10px] font-bold uppercase underline">Forgot?</a>
+                    </div>
+                    <input type="password" placeholder="........" id="login-password" class="input-field">
+                    <span class="absolute right-4 bottom-3 text-[10px] font-bold text-gray-400 cursor-pointer">SHOW</span>
+                </div>
+
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="keep" class="accent-black">
+                    <label for="keep" class="text-[10px] font-bold text-gray-400 uppercase">Keep me logged in</label>
+                </div>
+
+                <button onclick="handleLogin()" class="btn-black mt-4">LOG IN &rarr;</button>
+
+                <div class="relative py-4 flex items-center">
+                    <div class="flex-grow border-t border-gray-300"></div>
+                    <span class="flex-shrink mx-4 text-[10px] font-bold text-gray-400 uppercase">Or use social login</span>
+                    <div class="flex-grow border-t border-gray-300"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <button class="btn-social">Google</button>
+                    <button class="btn-social">Facebook</button>
+                </div>
+
+                <p class="text-center text-[10px] font-bold text-gray-400 mt-6">
+                    DON'T HAVE AN ACCOUNT? <button onclick="slideToJoin()" class="underline hover:text-black">REGISTER FOR FREE</button>
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+    
+    // Initialize Supabase
+      const _supabase = supabase.createClient('https://lvfbcbgmosfrpwvmrfhp.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2ZmJjYmdtb3NmcnB3dm1yZmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0Mjc3MTEsImV4cCI6MjA4OTAwMzcxMX0.CMvOjwLs_1sDunNpphV5niv668Y459TwfzxDLioXx8c');
+      const slider = document.getElementById('slider-container');
+
+      function slideToLogin() {
+          slider.style.transform = 'translateX(-50%)';
+      }
+
+      function slideToJoin() {
+          slider.style.transform = 'translateX(0%)';
+      }
+
+      // 1. SIGN UP LOGIC
+      async function handleSignUp() {
+          const email = document.getElementById('reg-email').value;
+          const password = document.getElementById('reg-password').value;
+          const firstName = document.getElementById('first-name').value;
+          const lastName = document.getElementById('last-name').value;
+          const contact_num = document.getElementById('reg-contact').value;
+          if (!email || !password) return alert("Please fill in email and password");
+
+          const { data, error } = await _supabase.auth.signUp({
+              email: email,
+              password: password,
+              options: {
+                  data: { first_name: firstName, last_name: lastName ,contact:contact_num}
+              }
+          });
+
+          if (error) {
+              alert("Error: " + error.message);
+          } else {
+              alert("Success! Check your email for confirmation.");
+              slideToLogin();
+          }
+      }
+
+      // 2. LOGIN LOGIC
+      async function handleLogin() {
+          const email = document.getElementById('login-email').value;
+          const password = document.getElementById('login-password').value;
+
+          if (!email || !password) return alert("Please fill in all fields");
+
+          const { data, error } = await _supabase.auth.signInWithPassword({
+              email: email,
+              password: password,
+          });
+
+          if (error) {
+              alert("Login failed: " + error.message);
+          } else {
+              window.location.href = 'home.html';
+          }
+      }
+
+      // 3. FORGOT PASSWORD
+      async function handleForgotPassword() {
+          const email = document.getElementById('login-email').value;
+          if (!email) return alert("Enter your email in the login field first.");
+
+          const { error } = await _supabase.auth.resetPasswordForEmail(email, {
+              redirectTo: window.location.origin + '/update.html', 
+          });
+
+          if (error) alert("Error: " + error.message);
+          else alert("Password reset link sent to your email!");
+      }
+    </script>
+</body>
+</html>

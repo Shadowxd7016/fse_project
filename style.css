@@ -1,0 +1,475 @@
+/* Page baseline */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Main categories wrapper */
+#categories {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+/* Each category section */
+.category h2 {
+    margin-bottom: 15px;
+    font-size: 22px;
+    color: #222;
+}
+
+/* Grid inside each category */
+.category > div {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+/* Product card (IMPORTANT: generic now, not tied to ID) */
+.category div > div {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+/* Hover effect */
+.category div > div:hover {
+    transform: scale(1.03);
+}
+
+/* Product image */
+.category img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Title */
+.category h3 {
+    margin: 10px 0 5px;
+    font-size: 18px;
+}
+
+/* Description */
+.category p {
+    margin: 5px 0;
+    color: #555;
+    font-size: 14px;
+}
+
+/* Price highlight */
+.category p:last-child {
+    font-weight: bold;
+    color: #000;
+}
+#category-bar {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+#category-bar button {
+    padding: 10px 15px;
+    border: none;
+    background-color: #fff;
+    border-radius: 20px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: 0.2s;
+}
+
+#category-bar button:hover {
+    background-color: #000;
+    color: #fff;
+}
+/* Category page header */
+#category-title {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #222;
+    text-transform: capitalize;
+}
+
+/* Optional: back button */
+#back-btn {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 8px 14px;
+    background: #fff;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+#back-btn:hover {
+    background: #000;
+    color: #fff;
+}
+/* Category page product grid */
+#product-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 25px;
+    max-width: 1200px;
+    margin: 0 auto; /* center the grid */
+}
+
+/* Product card (make sure it applies here too) */
+#product-container > div {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+#product-container > div:hover {
+    transform: scale(1.03);
+}
+
+/* Image */
+#product-container img {
+    width: 100%;
+    height: 200px; /* slightly bigger than homepage */
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Title */
+#product-container h3 {
+    margin: 10px 0 5px;
+    font-size: 18px;
+}
+
+/* Description */
+#product-container p {
+    margin: 5px 0;
+    color: #555;
+    font-size: 14px;
+}
+
+/* Price */
+#product-container p:last-child {
+    font-weight: bold;
+    color: #000;
+}
+/* Detail layout */
+.detail-container {
+    display: flex;
+    gap: 40px;
+    max-width: 1000px;
+    margin: 40px auto;
+}
+
+/* Image section */
+.image-section img {
+    width: 400px;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+/* Info section */
+.info-section {
+    flex: 1;
+}
+
+.info-section h1 {
+    margin-bottom: 10px;
+}
+
+.price {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.desc {
+    color: #555;
+    margin-bottom: 20px;
+}
+
+/* Button */
+.contact-btn {
+    padding: 12px 20px;
+    border: none;
+    background-color: black;
+    color: white;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.contact-btn:hover {
+    background-color: #333;
+}
+/* Image section layout */
+.image-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Slider image */
+#slider-image {
+    width: 400px;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+/* Buttons */
+#prev-btn, #next-btn {
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+#prev-btn:hover, #next-btn:hover {
+    background: #000;
+    color: #fff;
+}
+
+/* Navbar container */
+#navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+/* Logo */
+.logo {
+    margin: 0;
+    cursor: pointer;
+}
+
+/* Right side */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Links */
+.nav-right a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+}
+
+/* Button */
+#auth-btn {
+    padding: 8px 15px;
+    border: none;
+    background: black;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#auth-btn:hover {
+    background: #333;
+}
+
+/* Profile icon */
+.profile-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+/* Footer */
+#footer {
+    background: #111;
+    color: #fff;
+    padding: 40px 20px 20px;
+    margin-top: 50px;
+}
+
+/* Container */
+.footer-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+/* Sections */
+.footer-section h3,
+.footer-logo {
+    margin-bottom: 10px;
+}
+
+/* Links */
+.footer-section a {
+    display: block;
+    text-decoration: none;
+    color: #ccc;
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.footer-section a:hover {
+    color: #fff;
+}
+
+/* Social links */
+.socials {
+    margin-top: 10px;
+}
+
+.socials a {
+    margin-right: 10px;
+    color: #ccc;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.socials a:hover {
+    color: #fff;
+}
+
+/* Bottom text */
+.footer-bottom {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 13px;
+    color: #aaa;
+}
+
+.filter-group {
+    margin-bottom: 22px;
+}
+
+.filter-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+/* Inputs */
+
+.filter-group input[type="text"],
+.filter-group input[type="number"],
+.filter-group select 
+
+/* Inputs */
+
+.filter-group input[type="text"],
+.filter-group input[type="number"],
+.filter-group select 
+{
+    width: 90%;
+    padding: 9px 12px;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    font-size: 13px;
+    background: #fafafa;
+    outline: none;
+}
+
+.filter-group input:focus {
+    border-color: #000;
+    background: #fff;
+}
+.filter-sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 24px 18px;
+    position: sticky;
+    top: 70px;
+}
+
+/* Price */
+
+.price-row {
+    display: flex;
+    gap: 8px;
+}
+
+.price-row input {
+    width: 50%;
+}
+
+/* Conditions */
+
+.condition-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.condition-list label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.condition-list input {
+    accent-color: #000;
+}
+
+/* Buttons */
+
+.filter-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-apply {
+    padding: 10px;
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-apply:hover {
+    background: #333;
+}
+
+.btn-reset {
+    padding: 10px;
+    background: transparent;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-reset:hover {
+    border-color: #000;
+}
+
+.page-layout {
+    display: flex;
+    gap: 24px;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 20px;
+    align-items: flex-start;
+}

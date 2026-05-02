@@ -1,0 +1,381 @@
+* {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    :root {
+      --primary-color: #c6c3c3;
+      --second-color: #ffffff;
+      --black-color: #000000;
+    }
+
+    body {
+    background-image: url("registration_bg.png");
+    background-position:center top;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+    a {
+      text-decoration: none;
+      color: var(--second-color);
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 32px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+      background: rgba(0,0,0,0.25);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-logo {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      white-space: nowrap;
+      color:var(--second-color);
+      flex-shrink: 0;
+    }
+
+    .nav-logo span { color: var(--primary); }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .btn-ghost {
+      padding: 8px 20px;
+      border: 1.5px solid var(--primary);
+      border-radius: 30px;
+      font-size: 14px;
+      font-family: "Poppins", sans-serif;
+      cursor: pointer;
+      background: transparent;
+      color: var(--white);
+      transition: background 0.25s, color 0.25s;
+      font-weight: 500;
+    }
+
+    .btn-ghost:hover { background: var(--primary); color: var(--black); }
+
+    .btn-solid {
+      padding: 8px 22px;
+      border: none;
+      border-radius: 30px;
+      font-size: 14px;
+      font-family: "Poppins", sans-serif;
+      cursor: pointer;
+      background: var(--primary);
+      color: var(--black);
+      font-weight: 600;
+      transition: background 0.25s, transform 0.15s;
+    }
+
+    .btn-solid:hover { background: var(--white); transform: scale(1.03); }
+    /* ── Card container ── */
+    .card-container {
+      perspective: 1200px;
+      width: 450px;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+    }
+
+    .card-container.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    /* ── Shared face styles ── */
+    .card-face {
+      width: 100%;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 2px solid var(--primary-color);
+      border-radius: 15px;
+      color: var(--second-color);
+      box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-front {
+      padding: 7.5em 2.5em 4em 2.5em;
+    }
+
+    .card-back {
+      padding: 7.5em 2.5em 4em 2.5em;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: rotateY(180deg);
+    }
+
+    /* ── Header tab ── */
+    .login-header {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--primary-color);
+      width: 160px;
+      height: 70px;
+      border-radius: 0 0 20px 20px;
+      white-space: nowrap;
+    }
+
+    .login-header span {
+      font-size: 26px;
+      color: var(--black-color);
+      font-weight: 600;
+    }
+
+    .login-header::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -30px;
+      width: 30px;
+      height: 30px;
+      border-top-right-radius: 50%;
+      background: transparent;
+      box-shadow: 15px 0 0 0 var(--primary-color);
+    }
+
+    .login-header::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: -30px;
+      width: 30px;
+      height: 30px;
+      border-top-left-radius: 50%;
+      background: transparent;
+      box-shadow: -15px 0 0 0 var(--primary-color);
+    }
+
+    /* ── Inputs ── */
+    .input_box {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      margin: 20px 0;
+    }
+
+    .input-field {
+      width: 100%;
+      height: 55px;
+      font-size: 16px;
+      background: transparent;
+      color: var(--second-color);
+      padding-inline: 20px 50px;
+      border: 2px solid var(--primary-color);
+      border-radius: 30px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .input-field:focus {
+      border-color: var(--second-color);
+    }
+
+    .input-field::placeholder {
+      color: transparent;
+    }
+
+    .label {
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      transition: 0.2s;
+      pointer-events: none;
+    }
+
+    .input-field:focus ~ .label,
+    .input-field:valid ~ .label {
+      position: absolute;
+      top: -10px;
+      left: 20px;
+      font-size: 14px;
+      background-color: var(--primary-color);
+      border-radius: 30px;
+      color: var(--black-color);
+      padding: 0 10px;
+    }
+
+    .icon {
+      position: absolute;
+      top: 18px;
+      right: 25px;
+      font-size: 20px;
+    }
+
+    /* ── Remember / Forgot ── */
+    .remember-forgot {
+      display: flex;
+      justify-content: space-between;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    /* ── Submit button ── */
+    .input-submit {
+      width: 100%;
+      height: 50px;
+      background: #ececec;
+      font-size: 16px;
+      font-weight: 500;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.15s;
+    }
+
+    .input-submit:hover {
+      background: var(--second-color);
+      transform: scale(1.02);
+    }
+
+    .input-submit:active {
+      transform: scale(0.98);
+    }
+
+    /* ── Register / Login switch ── */
+    .register, .login-link {
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    .register a, .login-link a {
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* ── Password strength bar ── */
+    .strength-bar-wrap {
+      height: 4px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.2);
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .strength-bar {
+      height: 100%;
+      width: 0%;
+      border-radius: 4px;
+      transition: width 0.4s, background 0.4s;
+    }
+
+    .strength-label {
+      font-size: 12px;
+      margin-top: 4px;
+      color: rgba(255,255,255,0.75);
+      min-height: 16px;
+    }
+
+    /* ── Name row ── */
+    .name-row {
+      display: flex;
+      gap: 14px;
+    }
+
+    .name-row .input_box {
+      flex: 1;
+    }
+
+    /* ── Error hint ── */
+    .error-hint {
+      font-size: 12px;
+      color: #ff8080;
+      margin-top: 4px;
+      min-height: 16px;
+      padding-left: 8px;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+      color: rgba(255,255,255,0.5);
+      font-size: 13px;
+    }
+
+    .divider::before, .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.25);
+    }
+
+    /* ── Terms checkbox ── */
+    .terms-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 4px;
+    }
+
+    .terms-row input[type="checkbox"] {
+      margin-top: 3px;
+      accent-color: var(--primary-color);
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    @media only screen and (max-width: 564px) {
+      .wrapper {
+        padding: 20px;
+      }
+
+      .card-container {
+        width: 100%;
+      }
+
+      .card-front, .card-back {
+        padding: 7.5em 1.5em 4em 1.5em;
+      }
+
+      .name-row {
+        flex-direction: column;
+        gap: 0;
+      }
+    }

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="apply.js"></script>
+    <script src="supabase_config.js"></script>
+    <title>Technician Application | Portal</title>
+    
+        <style>
+        .apply-section { font-family: 'Inter', sans-serif; padding: 40px; background: #f8f9fa; }
+        .form-card { max-width: 550px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        
+        .form-header h2 { margin: 0; font-size: 1.5rem; color: #111; }
+        .form-header p { color: #666; margin-bottom: 30px; }
+
+        .info-notice { background: #eef6ff; padding: 12px; border-radius: 6px; font-size: 0.9rem; margin-bottom: 25px; border: 1px solid #d0e3ff; }
+
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 8px; color: #444; }
+        
+        .input-group input, .input-group select { 
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; box-sizing: border-box;
+        }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        .shop-section { background: #fdfdfd; padding: 15px; border: 1px dashed #ccc; border-radius: 8px; margin-bottom: 20px; }
+
+        .submit-btn { 
+            width: 100%; background: #111; color: white; padding: 16px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.3s;
+        }
+        .submit-btn:hover { background: #333; }
+
+        .radio-options { display: flex; gap: 20px; padding-top: 5px; }
+        small { color: #888; font-size: 0.75rem; }
+        </style>
+
+</head>
+<body>
+<section class="apply-section">
+  <div class="form-card">
+    <div class="form-header">
+      <h2>Professional Certification</h2>
+      <p>Complete your profile to join our technician network.</p>
+    </div>
+
+    <form id="techApplyForm">
+      <div id="info-notice" class="info-notice">
+        loading email....
+      </div>
+
+      <div class="input-group">
+        <label for="tech_number">Technical License / Certification Number</label>
+        <input type="text" id="tech_number" name="tech_number" placeholder="e.g. LIC-9982734" required>
+        <small>This is required for identity verification.</small>
+      </div>
+
+      <div class="form-row">
+        <div class="input-group">
+          <label for="experience">Years of Experience</label>
+          <select id="experience" name="experience" required>
+            <option value="1-2">1-2 Years</option>
+            <option value="3-5">3-5 Years</option>
+            <option value="5-10">5-10 Years</option>
+            <option value="10+">10+ Years</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="category">Primary Skillset</label>
+          <select id="category" name="category" required>
+            <option value="electrical">Electrical</option>
+            <option value="mechanical">Mechanical</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="shop-section">
+        <label class="checkbox-container">
+          <input type="checkbox" id="has_shop" onclick="toggleShop()"> I own/work at a physical shop
+        </label>
+
+        <div id="shop_details" style="display: none; margin-top: 20px;">
+          <div class="input-group">
+            <label for="shop_name">Shop Name</label>
+            <input type="text" id="shop_name" name="shop_name" placeholder="Official Shop Name">
+          </div>
+          <div class="input-group">
+            <label for="shop_number">Shop Contact Number</label>
+            <input type="tel" id="shop_number" name="shop_number" placeholder="+1 (555) 000-0000">
+          </div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="equipment">Do you have your own tools/transport?</label>
+        <div class="radio-options">
+          <label><input type="radio" name="tools" value="yes" required> Yes</label>
+          <label><input type="radio" name="tools" value="no"> No</label>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn">Submit Professional Profile</button>
+    </form>
+  </div>
+</section>
+</body>
+</html>
