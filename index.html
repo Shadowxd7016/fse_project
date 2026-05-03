@@ -872,10 +872,21 @@
             const description = document.getElementById('ad-desc').value;
             const imageFiles  = document.getElementById('ad-images').files;
             if (!title || !price) return alert('Please provide a title and price.');
+            if (isNaN(price) || parseFloat(price) <= 0) return alert('Please enter a valid price greater than 0.');
             if (!category) return alert('Please select a category.');
             if (!condition) return alert('Please select a condition.');
             if (!description) return alert('Please provide a description.');
             if (imageFiles.length === 0 && !currentEditingAdId) return alert('Please choose at least one image.');
+            const MAX_SIZE =  1024 * 1024;
+            const MIN_SIZE = 0.05 * 1024 * 1024;
+            for (let i = 0; i < imageFiles.length; i++) {
+                if (imageFiles[i].size > MAX_SIZE) {
+                    return alert(`File "${imageFiles[i].name}" is too large. Maximum size is 1MB.`);
+                }
+                if (imageFiles[i].size < MIN_SIZE) {
+                    return alert(`File "${imageFiles[i].name}" is too small. Minimum size is 50KB.`);
+                }
+            }
             try {
                 const { data: { user } } = await _supabase.auth.getUser();
                 let imageUrls = [];

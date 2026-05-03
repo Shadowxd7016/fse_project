@@ -36,19 +36,29 @@
             font-weight: 600;
             width: 100%;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .btn-social {
             border: 1.5px solid black;
             border-radius: 9999px;
-            padding: 0.5rem 1rem;
+            padding: 0.6rem 1rem;
             width: 100%;
             font-size: 0.75rem;
             font-weight: 700;
             text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s;
         }
+        
+        .btn-social:hover { background: #f3f4f6; }
 
-        /* Slide Transition Logic */
         #slider-container {
             display: flex;
             transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
@@ -68,63 +78,46 @@
             <div class="max-w-md">
                 <div class="text-4xl font-bold italic text-red-600 flex items-center mb-6">
                     <img src="Picture1.png" alt="logo" class="w-60 h-25" style="padding: 0% 5%;margin-left: 14%;">
-                    <span class="ml-2 text-xl not-italic text-gray-400"></span>
                 </div>
                 <h1 class="text-6xl outline-text mb-6">SELL FAST.<br>BUY EASY.<br>GO GREEN.</h1>
                 <div class="border-2 border-black p-4 rounded-xl max-w-xs">
                     <p class="font-bold text-sm">Pakistan's most trusted eco-friendly marketplace.</p>
                 </div>
-                <div class="mt-20 flex gap-4">
-                    <div class="border-2 border-black p-4 rounded-xl w-40">
-                        <p class="font-extrabold">10k+</p>
-                        <p class="text-[10px] uppercase text-gray-500">Verified Sellers</p>
-                    </div>
-                    <div class="border-2 border-black p-4 rounded-xl w-40">
-                        <p class="font-extrabold">100%</p>
-                        <p class="text-[10px] uppercase text-gray-500">Secure Trade</p>
-                    </div>
-                </div>
             </div>
 
             <div class="max-w-sm w-full space-y-4">
                 <h2 class="text-2xl font-extrabold uppercase">Join FixKar</h2>
-                <p class="text-[10px] font-bold text-gray-400 uppercase -mt-2">Create your secure account</p>
                 
+                <button onclick="handleGoogleAuth()" class="btn-social w-full">
+                    <i class="fab fa-google"></i> Continue with Google
+                </button>
+
+                <div class="relative py-2 flex items-center">
+                    <div class="flex-grow border-t border-gray-300"></div>
+                    <span class="flex-shrink mx-4 text-[10px] font-bold text-gray-400 uppercase">Or use email</span>
+                    <div class="flex-grow border-t border-gray-300"></div>
+                </div>
+
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="text-[10px] font-bold uppercase">First Name</label>
-                        <input type="text" placeholder="John" id="first-name" class="input-field">
+                        <input type="text" id="reg-first-name" placeholder="John" class="input-field">
                     </div>
                     <div>
                         <label class="text-[10px] font-bold uppercase">Last Name</label>
-                        <input type="text" placeholder="Doe" id="last-name" class="input-field">
+                        <input type="text" id="reg-last-name" placeholder="Doe" class="input-field">
                     </div>
                 </div>
                 <div>
                     <label class="text-[10px] font-bold uppercase">Email Address</label>
-                    <input type="email" placeholder="john@example.com" id="reg-email" required class="input-field">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold uppercase">Contact Number</label>
-                    <input type="text" placeholder="0300-1234567" id="reg-contact" class="input-field" required>
+                    <input type="email" id="reg-email" placeholder="name@email.com" class="input-field">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold uppercase">Password</label>
-                    <input type="password" placeholder="........" id="reg-password" class="input-field">
+                    <input type="password" id="reg-password" placeholder="........" class="input-field">
                 </div>
 
-                <button onclick="handleSignUp()" class="btn-black mt-4">START SELLING &rarr;</button>
-
-                <div class="relative py-4 flex items-center">
-                    <div class="flex-grow border-t border-gray-300"></div>
-                    <span class="flex-shrink mx-4 text-[10px] font-bold text-gray-400 uppercase">Verified Social Sign-on</span>
-                    <div class="flex-grow border-t border-gray-300"></div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <button class="btn-social">Google</button>
-                    <button class="btn-social">Facebook</button>
-                </div>
+                <button onclick="handleSignUp()" class="btn-black mt-4">CREATE ACCOUNT &rarr;</button>
 
                 <p class="text-center text-[10px] font-bold text-gray-400 mt-6">
                     MEMBER ALREADY? <button onclick="slideToLogin()" class="underline hover:text-black">LOG IN HERE</button>
@@ -136,51 +129,36 @@
             <div class="max-w-md">
                 <div class="text-4xl font-bold italic text-red-600 flex items-center mb-6">
                     <img src="Picture1.png" alt="logo" class="w-60 h-25" style="padding: 0% 5%;margin-left: 12%;">
-                    <span class="ml-2 text-xl not-italic text-gray-400"></span>
                 </div>
                 <h1 class="text-6xl outline-text mb-6">WELCOME<br>BACK TO<br>THE HUB.</h1>
-                <div class="border-2 border-black p-4 rounded-xl max-w-xs">
-                    <p class="font-bold text-sm">Manage your listings and chat with buyers.</p>
-                </div>
-                <div class="mt-12">
-                   <span class="bg-black text-white text-[10px] px-3 py-1 rounded-md font-bold">⚡ Top Rated Marketplace</span>
-                </div>
             </div>
 
             <div class="max-w-sm w-full space-y-4">
                 <h2 class="text-2xl font-extrabold uppercase">Log In</h2>
-                <p class="text-[10px] font-bold text-gray-400 uppercase -mt-2">Enter your credentials to access Fixkar</p>
+
+                <button onclick="handleGoogleAuth()" class="btn-social w-full">
+                    <i class="fab fa-google"></i> Login with Google
+                </button>
+
+                <div class="relative py-2 flex items-center">
+                    <div class="flex-grow border-t border-gray-300"></div>
+                    <span class="flex-shrink mx-4 text-[10px] font-bold text-gray-400 uppercase">Or use email</span>
+                    <div class="flex-grow border-t border-gray-300"></div>
+                </div>
                 
                 <div>
                     <label class="text-[10px] font-bold uppercase">Email Address</label>
-                    <input type="email" placeholder="name@company.com" id="login-email" class="input-field">
+                    <input type="email" id="login-email" placeholder="name@email.com" class="input-field">
                 </div>
-                <div class="relative">
+                <div>
                     <div class="flex justify-between">
                         <label class="text-[10px] font-bold uppercase">Password</label>
-                        <a href="#" class="text-[10px] font-bold uppercase underline">Forgot?</a>
+                        <button onclick="handleForgotPassword()" class="text-[10px] font-bold uppercase underline">Forgot?</button>
                     </div>
-                    <input type="password" placeholder="........" id="login-password" class="input-field">
-                    <span class="absolute right-4 bottom-3 text-[10px] font-bold text-gray-400 cursor-pointer">SHOW</span>
-                </div>
-
-                <div class="flex items-center space-x-2">
-                    <input type="checkbox" id="keep" class="accent-black">
-                    <label for="keep" class="text-[10px] font-bold text-gray-400 uppercase">Keep me logged in</label>
+                    <input type="password" id="login-password" placeholder="........" class="input-field">
                 </div>
 
                 <button onclick="handleLogin()" class="btn-black mt-4">LOG IN &rarr;</button>
-
-                <div class="relative py-4 flex items-center">
-                    <div class="flex-grow border-t border-gray-300"></div>
-                    <span class="flex-shrink mx-4 text-[10px] font-bold text-gray-400 uppercase">Or use social login</span>
-                    <div class="flex-grow border-t border-gray-300"></div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <button class="btn-social">Google</button>
-                    <button class="btn-social">Facebook</button>
-                </div>
 
                 <p class="text-center text-[10px] font-bold text-gray-400 mt-6">
                     DON'T HAVE AN ACCOUNT? <button onclick="slideToJoin()" class="underline hover:text-black">REGISTER FOR FREE</button>
@@ -191,75 +169,102 @@
     </div>
 
     <script>
-    
-    // Initialize Supabase
-      const _supabase = supabase.createClient('https://lvfbcbgmosfrpwvmrfhp.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2ZmJjYmdtb3NmcnB3dm1yZmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0Mjc3MTEsImV4cCI6MjA4OTAwMzcxMX0.CMvOjwLs_1sDunNpphV5niv668Y459TwfzxDLioXx8c');
-      const slider = document.getElementById('slider-container');
+        const _supabase = supabase.createClient('https://lvfbcbgmosfrpwvmrfhp.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2ZmJjYmdtb3NmcnB3dm1yZmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0Mjc3MTEsImV4cCI6MjA4OTAwMzcxMX0.CMvOjwLs_1sDunNpphV5niv668Y459TwfzxDLioXx8c');
+        
+        const MAX_ATTEMPTS = 3;
+        const COOLDOWN_TIME = 30 * 1000;
+        let getAttempts = () => parseInt(localStorage.getItem('login_attempts')) || 0;
+        let setAttempts = (val) => localStorage.setItem('login_attempts', val);
 
-      function slideToLogin() {
-          slider.style.transform = 'translateX(-50%)';
-      }
+        function slideToLogin() { document.getElementById('slider-container').style.transform = 'translateX(-50%)'; }
+        function slideToJoin() { document.getElementById('slider-container').style.transform = 'translateX(0%)'; }
 
-      function slideToJoin() {
-          slider.style.transform = 'translateX(0%)';
-      }
+        // 1. GOOGLE AUTH
+        async function handleGoogleAuth() {
+            const { error } = await _supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: { redirectTo: 'https://shadowxd7016.github.io/fse_project/home.html' }
+            });
+            if (error) alert(error.message);
+        }
 
-      // 1. SIGN UP LOGIC
-      async function handleSignUp() {
-          const email = document.getElementById('reg-email').value;
-          const password = document.getElementById('reg-password').value;
-          const firstName = document.getElementById('first-name').value;
-          const lastName = document.getElementById('last-name').value;
-          const contact_num = document.getElementById('reg-contact').value;
-          if (!email || !password) return alert("Please fill in email and password");
+        // 2. EMAIL SIGN UP
+        async function handleSignUp() {
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const fName = document.getElementById('reg-first-name').value;
+            const lName = document.getElementById('reg-last-name').value;
 
-          const { data, error } = await _supabase.auth.signUp({
-              email: email,
-              password: password,
-              options: {
-                  data: { first_name: firstName, last_name: lastName ,contact:contact_num}
-              }
-          });
+            if (!email || !password) return alert("Fill required fields");
 
-          if (error) {
-              alert("Error: " + error.message);
-          } else {
-              alert("Success! Check your email for confirmation.");
-              slideToLogin();
-          }
-      }
+            const { error } = await _supabase.auth.signUp({
+                email, password, options: { data: { first_name: fName, last_name: lName } }
+            });
 
-      // 2. LOGIN LOGIC
-      async function handleLogin() {
-          const email = document.getElementById('login-email').value;
-          const password = document.getElementById('login-password').value;
+            if (error) alert(error.message);
+            else { alert("Success! Check email for verification."); slideToLogin(); }
+        }
 
-          if (!email || !password) return alert("Please fill in all fields");
+        // 3. EMAIL LOGIN (With 3-Attempt Lockout)
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            const lockoutTime = localStorage.getItem('lockout_until');
+            if (lockoutTime && (parseInt(lockoutTime) - Date.now()) > 0) {
+                const rem = Math.ceil((parseInt(lockoutTime) - Date.now()) / 1000);
+                return alert(`Locked out. Wait ${rem}s`);
+            }
 
-          const { data, error } = await _supabase.auth.signInWithPassword({
-              email: email,
-              password: password,
-          });
+            const { error } = await _supabase.auth.signInWithPassword({ email, password });
 
-          if (error) {
-              alert("Login failed: " + error.message);
-          } else {
-              window.location.href = 'home.html';
-          }
-      }
+            if (error) {
+                let att = getAttempts() + 1;
+                setAttempts(att);
+                if (att >= MAX_ATTEMPTS) {
+                    localStorage.setItem('lockout_until', Date.now() + COOLDOWN_TIME);
+                    startCooldownUI(COOLDOWN_TIME);
+                    alert("Locked for 30 seconds.");
+                } else {
+                    alert(`Failed. Attempts left: ${MAX_ATTEMPTS - att}`);
+                }
+            } else {
+                localStorage.removeItem('login_attempts');
+                localStorage.removeItem('lockout_until');
+                window.location.href = 'home.html';
+            }
+        }
 
-      // 3. FORGOT PASSWORD
-      async function handleForgotPassword() {
-          const email = document.getElementById('login-email').value;
-          if (!email) return alert("Enter your email in the login field first.");
+        function startCooldownUI(dur) {
+            const btn = document.querySelector("button[onclick='handleLogin()']");
+            btn.disabled = true; btn.classList.add('opacity-50');
+            let sec = Math.ceil(dur / 1000);
+            const timer = setInterval(() => {
+                sec--; btn.innerText = `WAIT (${sec}s)`;
+                if (sec <= 0) { 
+                    clearInterval(timer); btn.disabled = false; 
+                    btn.innerText = "LOG IN →"; btn.classList.remove('opacity-50'); 
+                }
+            }, 1000);
+        }
 
-          const { error } = await _supabase.auth.resetPasswordForEmail(email, {
-              redirectTo: window.location.origin + '/update.html', 
-          });
+        async function handleForgotPassword() {
+            const email = document.getElementById('login-email').value;
+            if (!email) return alert("Enter email first");
+            const { error } = await _supabase.auth.resetPasswordForEmail(email);
+            alert(error ? error.message : "Reset link sent!");
+        }
 
-          if (error) alert("Error: " + error.message);
-          else alert("Password reset link sent to your email!");
-      }
+        window.onload = async () => {
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (session) window.location.href = 'home.html';
+            
+            const lockoutTime = localStorage.getItem('lockout_until');
+            if (lockoutTime) {
+                const rem = parseInt(lockoutTime) - Date.now();
+                if (rem > 0) startCooldownUI(rem);
+            }
+        };
     </script>
 </body>
 </html>
