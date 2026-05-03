@@ -181,11 +181,22 @@
 
         // 1. GOOGLE AUTH
         async function handleGoogleAuth() {
+            // Detect if we are on localhost or GitHub Pages
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            
+            // Set the destination based on where the code is running
+            const redirectTarget = isLocal 
+                ? 'http://localhost:5500/home.html' 
+                : 'https://shadowxd7016.github.io/fse_project/home.html';
+
             const { error } = await _supabase.auth.signInWithOAuth({
                 provider: 'google',
-                options: { redirectTo: 'https://shadowxd7016.github.io/fse_project/home.html' }
+                options: { 
+                    redirectTo: redirectTarget 
+                }
             });
-            if (error) alert(error.message);
+            
+            if (error) alert("Auth Error: " + error.message);
         }
 
         // 2. EMAIL SIGN UP
@@ -256,13 +267,22 @@
         }
 
         window.onload = async () => {
-            const { data: { session } } = await _supabase.auth.getSession();
-            if (session) window.location.href = 'home.html';
+            // 1. Process the login result from Supabase
+            const { data, error } = await _supabase.auth.getSession();
             
+            if (data.session) {
+                // We have a user! Send them to home.html
+                // Use './home.html' to keep the path relative to your current folder
+                window.location.replace('./home.html');
+            }
+
+            // 2. Keep your existing Lockout logic
             const lockoutTime = localStorage.getItem('lockout_until');
             if (lockoutTime) {
-                const rem = parseInt(lockoutTime) - Date.now();
-                if (rem > 0) startCooldownUI(rem);
+                const remaining = parseInt(lockoutTime) - Date.now();
+                if (remaining > 0) {
+                    startCooldownUI(remaining);
+                }
             }
         };
     </script>
