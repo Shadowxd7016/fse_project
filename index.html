@@ -872,6 +872,10 @@
             const description = document.getElementById('ad-desc').value;
             const imageFiles  = document.getElementById('ad-images').files;
             if (!title || !price) return alert('Please provide a title and price.');
+            if (!category) return alert('Please select a category.');
+            if (!condition) return alert('Please select a condition.');
+            if (!description) return alert('Please provide a description.');
+            if (imageFiles.length === 0 && !currentEditingAdId) return alert('Please choose at least one image.');
             try {
                 const { data: { user } } = await _supabase.auth.getUser();
                 let imageUrls = [];
