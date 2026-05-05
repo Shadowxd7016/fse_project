@@ -38,7 +38,8 @@
             padding: 1.2rem 5%; background: var(--white);
             border-bottom: 1px solid var(--gray-100); position: sticky; top: 0; z-index: 100;
         }
-        .logo { font-weight: 800; font-size: 1.6rem; text-decoration: none; color: var(--dark); italic; }
+        .logo { font-weight: 800; font-size: 1.6rem; text-decoration: none; color: var(--dark);
+             font-style: italic; }
         .logo span { color: var(--red); }
         .nav-links { display: flex; gap: 2rem; align-items: center; }
         .nav-links a { text-decoration: none; color: var(--gray-500); font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
@@ -47,9 +48,13 @@
         /* ── HEADER ── */
         .page-header { max-width: 1200px; margin: 50px auto 30px; padding: 0 2.5rem; }
         .product-pill { 
-            display: inline-flex; align-items: center; gap: 8px;
-            background: var(--white); padding: 8px 18px; border-radius: 100px; 
-            border: 1px solid var(--border); margin-bottom: 20px; font-size: 0.85rem; 
+            display: inline-flex; align-items: center; 
+            gap: 8px;
+            background: var(--white);
+            padding: 8px 18px; 
+            border-radius: 100px; 
+            border: 1px solid var(--border);
+            margin-bottom: 20px; font-size: 0.85rem; 
             font-weight: 600; color: var(--gray-500);
         }
         .product-pill strong { color: var(--red); }
@@ -146,7 +151,7 @@
 
 <div class="success-overlay" id="successOverlay">
     <div class="success-modal">
-        <div class="success-icon">check_circle</div>
+        <span class="success-icon material-symbols-outlined">check_circle</span>
         <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 15px;">Request Sent!</h2>
         <p style="color: var(--gray-500); line-height: 1.6; margin-bottom: 30px;">The technician has been notified. They will review your product details and contact you via your profile email.</p>
         <button class="btn-submit" style="width: 100%;" onclick="window.location.href='home.html'">Back to Home</button>
@@ -230,6 +235,7 @@
         const { data: { user } } = await db.auth.getUser();
         if (!user) { 
             alert("Please login first"); 
+            window.location.href = "registration.html";
             return; 
         }
         const { error } = await db.from('repair_orders').insert([{
